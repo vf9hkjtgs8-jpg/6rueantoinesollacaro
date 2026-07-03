@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syndic Bénévole v14 — Gestion de copropriété</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f5f5f4;--bg3:#eeede9;
+  --text:#1a1a18;--text2:#6b6b67;--text3:#a0a09b;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+  --blue-bg:#e6f1fb;--blue-text:#0c447c;--blue-border:#b5d4f4;
+  --green-bg:#eaf3de;--green-text:#3b6d11;--green-border:#c0dd97;
+  --red-bg:#fcebeb;--red-text:#a32d2d;--red-border:#f7c1c1;
+  --amber-bg:#faeeda;--amber-text:#854f0b;--amber-border:#fac775;
+  --purple-bg:#f0eaf9;--purple-text:#5b21b6;--purple-border:#c4b5fd;
+  --teal-bg:#e0f2f1;--teal-text:#00695c;--teal-border:#80cbc4;
+  --gray-bg:#f1efe8;--gray-text:#5f5e5a;--gray-border:#d3d1c7;
+  --radius:8px;--radius-lg:12px;--shadow:0 1px 3px rgba(0,0,0,0.08)
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1e1e1c;--bg2:#2a2a28;--bg3:#333330;
+  --text:#f0efeb;--text2:#a8a8a2;--text3:#6b6b67;
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.18);
+  --blue-bg:#042c53;--blue-text:#b5d4f4;--blue-border:#185fa5;
+  --green-bg:#173404;--green-text:#c0dd97;--green-border:#3b6d11;
+  --red-bg:#501313;--red-text:#f7c1c1;--red-border:#a32d2d;
+  --amber-bg:#412402;--amber-text:#fac775;--amber-border:#854f0b;
+  --purple-bg:#2d1b5e;--purple-text:#c4b5fd;--purple-border:#5b21b6;
+  --teal-bg:#003d36;--teal-text:#80cbc4;--teal-border:#00695c;
+  --gray-bg:#2c2c2a;--gray-text:#d3d1c7;--gray-border:#444441
+}}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg3);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+.app-header{background:var(--bg);border-bottom:.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow)}
+.app-header h1{font-size:15px;font-weight:500}
+.app-header .sub{font-size:11px;color:var(--text2)}
+.save-ok{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:#63a020}
+.layout{display:flex;min-height:calc(100vh - 49px)}
+.sidebar{width:200px;background:var(--bg);border-right:.5px solid var(--border);padding:12px 8px;flex-shrink:0;overflow-y:auto}
+.sid-sec{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin:14px 6px 5px;padding-left:3px}
+.nav-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;border-radius:var(--radius);border:none;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;text-align:left;font-family:inherit;transition:background .12s,color .12s}
+.nav-btn svg{width:14px;height:14px;flex-shrink:0;opacity:.7}
+.nav-btn:hover{background:var(--bg2);color:var(--text)}
+.nav-btn.active{background:var(--blue-bg);color:var(--blue-text);font-weight:500}
+.nav-btn.active svg{opacity:1}
+.main{flex:1;padding:22px;overflow:auto;max-width:100%}
+.sec{display:none}.sec.active{display:block}
+.sec-hd{margin-bottom:18px}
+.sec-hd h2{font-size:17px;font-weight:500}
+.sec-hd p{font-size:12px;color:var(--text2);margin-top:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+.ct{font-size:13px;font-weight:500;margin-bottom:12px;color:var(--text)}
+.metric{background:var(--bg2);border-radius:var(--radius);padding:12px}
+.ml{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.mv{font-size:24px;font-weight:500}
+.ms{font-size:11px;color:var(--text3);margin-top:1px}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:3px;margin-top:10px}
+input,select,textarea{width:100%;padding:7px 9px;border:.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,.15)}
+textarea{resize:vertical;min-height:70px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn{padding:7px 14px;border-radius:var(--radius);border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-size:12px;cursor:pointer;font-family:inherit;transition:background .12s}
+.btn:hover{background:var(--bg2)}
+.btn-p{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);font-weight:500}
+.btn-p:hover{opacity:.85}
+.btn-d{background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)}
+.btn-sm{padding:3px 9px;font-size:11px}
+.btn-g{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);font-weight:500}
+.ab{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.hr{border:none;border-top:.5px solid var(--border);margin:14px 0}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+.b-ok{background:var(--green-bg);color:var(--green-text)}
+.b-warn{background:var(--amber-bg);color:var(--amber-text)}
+.b-err{background:var(--red-bg);color:var(--red-text)}
+.b-info{background:var(--blue-bg);color:var(--blue-text)}
+.b-pur{background:var(--purple-bg);color:var(--purple-text)}
+.b-teal{background:var(--teal-bg);color:var(--teal-text)}
+.b-n{background:var(--gray-bg);color:var(--gray-text)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--text2);font-weight:500;font-size:10px;padding:5px 8px;border-bottom:.5px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+td{padding:8px;border-bottom:.5px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.pb{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:6px}
+.pf{height:100%;background:#378add;border-radius:4px;transition:width .4s}
+.al{border-left:3px solid;padding:9px 12px;border-radius:0 var(--radius) var(--radius) 0;margin-bottom:7px;font-size:12px}
+.al-w{border-color:#ef9f27;background:var(--amber-bg);color:var(--amber-text)}
+.al-e{border-color:#e24b4a;background:var(--red-bg);color:var(--red-text)}
+.al-ok{border-color:#63a020;background:var(--green-bg);color:var(--green-text)}
+.al-i{border-color:#378add;background:var(--blue-bg);color:var(--blue-text)}
+.doc{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--radius);padding:14px;font-size:12px;white-space:pre-wrap;line-height:1.8;min-height:180px;font-family:'Courier New',monospace;color:var(--text)}
+.del{background:none;border:none;cursor:pointer;color:var(--red-text);padding:2px 6px;border-radius:4px;font-size:13px}
+.del:hover{background:var(--red-bg)}
+.lchip{display:inline-flex;align-items:center;font-size:10px;background:var(--blue-bg);color:var(--blue-text);border-radius:var(--radius);padding:2px 7px;font-weight:500}
+.es{text-align:center;padding:30px;color:var(--text3);font-size:12px}
+.hint{font-size:11px;color:var(--text3);margin-top:4px}
+/* Listes paramètres */
+.list-manager{display:flex;flex-direction:column;gap:3px}
+.list-item{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border-radius:var(--radius);border:.5px solid var(--border);transition:border-color .12s,opacity .15s,box-shadow .15s}
+.list-item:hover{border-color:var(--border2)}
+.list-item.drag-over{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,.2);background:var(--blue-bg)}
+.list-item.dragging{opacity:.35;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.list-item span{flex:1;font-size:13px}
+.drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:0 3px;user-select:none;flex-shrink:0;line-height:1;letter-spacing:-1px}
+.drag-handle:active{cursor:grabbing}
+.list-item-move{display:none}
+.list-add-row{display:flex;gap:6px;margin-top:6px}
+.list-add-row input{flex:1}
+/* Appels de fonds */
+.appel-card{border:.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;background:var(--bg);margin-bottom:10px}
+.appel-card.selected{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,.15)}
+.appel-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.appel-header h4{flex:1;font-size:13px;font-weight:500}
+.appel-summary{background:var(--bg2);border-radius:var(--radius);padding:10px;font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+.appel-summary span{color:var(--text2)}
+.appel-summary strong{color:var(--text)}
+/* Clés répartition */
+.cle-rep-card{border:.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;background:var(--bg);margin-bottom:10px}
+.cle-rep-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cle-rep-header strong{flex:1;font-size:13px}
+/* Fiche appel de fonds */
+.fiche-card{border:.5px solid var(--border2);border-radius:var(--radius-lg);padding:16px;background:var(--bg);margin-bottom:12px;position:relative}
+.fiche-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.fiche-avatar{width:44px;height:44px;border-radius:50%;background:var(--blue-bg);color:var(--blue-text);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex-shrink:0}
+.fiche-info h4{font-size:14px;font-weight:500;margin-bottom:2px}
+.fiche-info p{font-size:11px;color:var(--text2)}
+.fiche-solde{text-align:right}
+.fiche-solde .amount{font-size:20px;font-weight:500}
+/* Paiement */
+.pay-row-paid td{opacity:.6}
+/* Urgences */
+.urg-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-lg);border:.5px solid var(--border);background:var(--bg);margin-bottom:8px}
+.urg-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.urg-icon svg{width:16px;height:16px}
+.urg-tel{font-size:15px;font-weight:500;color:var(--blue-text)}
+/* Journal */
+.jou-entry{border-left:3px solid var(--border2);padding:8px 12px;margin-bottom:8px;border-radius:0 var(--radius) var(--radius) 0;background:var(--bg2)}
+/* Calendrier */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:6px}
+.cal-dn{text-align:center;font-size:10px;font-weight:500;color:var(--text3);padding:4px 0}
+.cal-day{min-height:54px;border-radius:6px;padding:4px;border:.5px solid var(--border);background:var(--bg);font-size:11px}
+.cal-day.today{border-color:#378add;background:var(--blue-bg)}
+.cal-day.om{opacity:.35}
+.cal-dn-num{font-weight:500;font-size:11px;margin-bottom:2px}
+.cal-evt{font-size:9px;padding:1px 4px;border-radius:3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Paramètres */
+.param-section{margin-bottom:24px}
+.param-section h3{font-size:13px;font-weight:500;margin-bottom:10px;padding-bottom:6px;border-bottom:.5px solid var(--border)}
+.stat-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:.5px solid var(--border);font-size:12px}
+/* Lots linkage indicator */
+.lot-link{font-size:10px;background:var(--teal-bg);color:var(--teal-text);border-radius:4px;padding:1px 6px;margin-left:4px}
+.cop-lot-row{display:grid;grid-template-columns:1fr 90px auto 28px;gap:6px;align-items:center;padding:5px 8px;background:var(--bg2);border:.5px solid var(--border);border-radius:var(--radius);margin-bottom:4px;font-size:12px}
+.cop-lot-row label{font-size:11px;color:var(--text2);margin:0}
+@media(max-width:900px){.sidebar{width:48px}.nav-btn span{display:none}.sid-sec{display:none}.g2,.g4{grid-template-columns:1fr}.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#378add" stroke-width="1.4"><path d="M4 21V10l9-7 9 7v11"/><rect x="10" y="14" width="6" height="7"/><path d="M2 21h22"/></svg>
+  <div id="header-logo-wrap" style="display:none"><img id="header-logo" src="" alt="Logo" style="height:36px;object-fit:contain;border-radius:4px"/></div>
+  <div><h1>Syndic Bénévole <span id="app-version" style="font-size:10px;color:var(--text3);font-weight:400">v14</span></h1><div class="sub" id="header-sub">Gestion de copropriété</div></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+    <button class="btn btn-sm" onclick="exportData()" title="Exporter les données en JSON" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;line-height:1">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 3v10m-4-4l4 4 4-4"/><rect x="3" y="15" width="14" height="2" rx="1"/></svg>
+    </button>
+    <button class="btn btn-sm" onclick="G('import-file-input').click()" title="Importer un fichier JSON" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;line-height:1">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 17V7m-4 4l4-4 4 4"/><rect x="3" y="3" width="14" height="2" rx="1"/></svg>
+    </button>
+    <input type="file" id="import-file-input" accept=".json" onchange="importData(event)" style="display:none"/>
+    <button class="btn btn-sm" onclick="T('donnees-coller')" title="Coller du JSON manuellement" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;line-height:1">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="2" width="10" height="14" rx="2"/><rect x="3" y="5" width="10" height="14" rx="2"/></svg>
+    </button>
+    <div class="save-ok" style="margin-left:4px"><div class="dot"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sid-sec">Vue d'ensemble</div>
+  <button class="nav-btn active" data-tab="accueil" onclick="T('accueil')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="6" height="8" rx="1"/><rect x="11" y="5" width="6" height="12" rx="1"/><path d="M1 17h18"/></svg><span>Tableau de bord</span></button>
+  <button class="nav-btn" data-tab="agenda" onclick="T('agenda')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M3 8h14M7 3v2m6-2v2"/></svg><span>Calendrier</span></button>
+  <button class="nav-btn" data-tab="journal" onclick="T('journal')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="12" height="14" rx="2"/><path d="M7 7h6M7 10h6M7 13h4"/></svg><span>Journal de bord</span></button>
+  <button class="nav-btn" data-tab="urgence" onclick="T('urgence')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h2l1 4-2 1.5a10 10 0 0 0 4.5 4.5L13 11l4 1v2a2 2 0 0 1-2 2C7 16 4 9 4 5a2 2 0 0 1 2-2z"/></svg><span>Urgences</span></button>
+
+  <div class="sid-sec">Finances</div>
+  <button class="nav-btn" data-tab="copros" onclick="T('copros')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="7" r="3"/><path d="M3 17c0-3 2.2-5 5-5"/><circle cx="14" cy="9" r="2.5"/><path d="M11 17c0-2 1.5-4 3-4s3 2 3 4"/></svg><span>Copropriétaires</span></button>
+  <button class="nav-btn" data-tab="charges" onclick="T('charges')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M7 9h6M7 12h4M3 7h14"/></svg><span>Appels de fonds</span></button>
+  <button class="nav-btn" data-tab="fiches" onclick="T('fiches')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 2.7-5 6-5s6 2 6 5"/><path d="M14 3l2 2-3 3"/></svg><span>Fiches appel de fond</span></button>
+  <button class="nav-btn" data-tab="releve" onclick="T('releve')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M4 18c0-3 2.7-5 6-5s6 2 6 5"/><path d="M14 4l2 2-4 4"/></svg><span>Relevés</span></button>
+  <button class="nav-btn" data-tab="repartition" onclick="T('repartition')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5M6 10h4"/></svg><span>Clés de répartition</span></button>
+  <button class="nav-btn" data-tab="budget" onclick="T('budget')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 14l4-4 4 4 4-6"/></svg><span>Budget</span></button>
+  <button class="nav-btn" data-tab="fonds" onclick="T('fonds')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg><span>Fonds travaux</span></button>
+  <button class="nav-btn" data-tab="sinistres" onclick="T('sinistres')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3l7 12H3L10 3z"/><path d="M10 8v4m0 2v.5"/></svg><span>Sinistres</span></button>
+  <button class="nav-btn" data-tab="locations" onclick="T('locations')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="14" height="9" rx="1"/><path d="M6 9V7a4 4 0 0 1 8 0v2"/></svg><span>Locations</span></button>
+
+  <div class="sid-sec">Technique</div>
+  <button class="nav-btn" data-tab="lots" onclick="T('lots')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="8" rx="1"/><rect x="11" y="3" width="7" height="8" rx="1"/><rect x="2" y="13" width="7" height="4" rx="1"/><rect x="11" y="13" width="7" height="4" rx="1"/></svg><span>Lots du bâtiment</span></button>
+  <button class="nav-btn" data-tab="batiment" onclick="T('batiment')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 16V8l6-5 6 5v8"/><rect x="8" y="11" width="4" height="5"/><path d="M2 16h16"/></svg><span>Bâtiment</span></button>
+  <button class="nav-btn" data-tab="prestataires" onclick="T('prestataires')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 4H7a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/><path d="M10 8v4m0 0h2m-2 0H8"/></svg><span>Prestataires</span></button>
+  <button class="nav-btn" data-tab="cles" onclick="T('cles')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="9" r="4"/><path d="M11.5 12.5l5 5m-3-5l2 2"/></svg><span>Clés & badges</span></button>
+
+  <div class="sid-sec">Administratif</div>
+  <button class="nav-btn" data-tab="ag" onclick="T('ag')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 9A7 7 0 1 0 3 9"/><path d="M3 9v5a2 2 0 0 0 2 2h1m8 0h1a2 2 0 0 0 2-2V9"/></svg><span>Assemblée générale</span></button>
+  <button class="nav-btn" data-tab="courriers" onclick="T('courriers')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="16" height="13" rx="2"/><path d="M2 7l8 5 8-5"/></svg><span>Courriers</span></button>
+
+  <div class="sid-sec">Configuration</div>
+  <button class="nav-btn" data-tab="parametres" onclick="T('parametres')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 2v2m0 12v2M2 10h2m12 0h2m-3.17-6.83-1.42 1.42M4.59 15.41l1.42-1.42m0-9.17 1.42 1.42M15.41 15.41l-1.42-1.42"/></svg><span>Paramètres</span></button>
+  <button class="nav-btn" data-tab="donnees" onclick="T('donnees')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="10" cy="6" rx="7" ry="3"/><path d="M3 6v4c0 1.66 3.13 3 7 3s7-1.34 7-3V6"/><path d="M3 10v4c0 1.66 3.13 3 7 3s7-1.34 7-3v-4"/></svg><span>Mes données</span></button>
+</nav>
+
+<main class="main">
+
+<!-- ACCUEIL -->
+<div id="accueil" class="sec active">
+  <div class="sec-hd"><h2>Tableau de bord</h2><p>Vue d'ensemble de votre copropriété</p></div>
+  <div class="g4">
+    <div class="metric"><div class="ml">Copropriétaires</div><div class="mv" id="nb-cop">0</div><div class="ms">lots enregistrés</div></div>
+    <div class="metric"><div class="ml">Impayés</div><div class="mv" id="nb-imp" style="color:#e24b4a">0 €</div><div class="ms">charges dues</div></div>
+    <div class="metric"><div class="ml">Appels actifs</div><div class="mv" id="nb-appels">0</div><div class="ms">en cours</div></div>
+    <div class="metric"><div class="ml">Sinistres ouverts</div><div class="mv" id="nb-sin">0</div><div class="ms">en traitement</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Alertes</div><div id="dash-alertes"><div class="es">Aucune alerte.</div></div></div>
+    <div class="card">
+      <div class="ct">Taux de recouvrement global</div>
+      <div id="dash-taux" style="font-size:12px;color:var(--text2)">Aucun appel de fonds.</div>
+      <div class="pb"><div class="pf" id="dash-pf" style="width:0%"></div></div>
+      <div class="hr"></div>
+      <div class="ct">Prochaines échéances</div>
+      <div id="dash-ech"><div class="es">Aucune échéance.</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Informations de la copropriété</div>
+    <div class="fr"><div><label>Nom de l'immeuble</label><input id="imm-nom" placeholder="Résidence Les Palmiers" oninput="saveImm()"/></div><div><label>Adresse</label><input id="imm-adr" placeholder="12 rue de la Paix, 20000 Ajaccio" oninput="saveImm()"/></div></div>
+    <div class="fr3"><div><label>Nombre de lots</label><input id="imm-lots" type="number" placeholder="12" oninput="saveImm()"/></div><div><label>Année de construction</label><input id="imm-an" type="number" placeholder="1975" oninput="saveImm()"/></div><div><label>Votre nom (syndic)</label><input id="imm-syn" placeholder="Prénom Nom" oninput="saveImm()"/></div></div>
+    <div class="hr"></div>
+    <div class="ct" style="margin-bottom:8px">RIB du syndic <span style="font-size:11px;font-weight:400;color:var(--text2)">(rappelé automatiquement dans les appels de fonds)</span></div>
+    <div class="fr3"><div><label>IBAN</label><input id="imm-rib" placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" oninput="saveImm()"/></div><div><label>Banque</label><input id="imm-banque" placeholder="Crédit Agricole..." oninput="saveImm()"/></div><div><label>Domiciliation</label><input id="imm-dom" placeholder="Agence Ajaccio..." oninput="saveImm()"/></div></div>
+  </div>
+</div>
+
+<!-- CALENDRIER -->
+<div id="agenda" class="sec">
+  <div class="sec-hd"><h2>Calendrier des échéances</h2></div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <button class="btn" onclick="calNav(-1)">◀</button>
+      <strong id="cal-title" style="font-size:14px;flex:1;text-align:center"></strong>
+      <button class="btn" onclick="calNav(1)">▶</button>
+      <button class="btn btn-p" onclick="calToday()">Aujourd'hui</button>
+    </div>
+    <div class="cal-grid" id="cal-names"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:12px">
+      <span><span class="badge b-info">●</span> Appel de fonds</span>
+      <span><span class="badge b-warn">●</span> Contrat/contrôle</span>
+      <span><span class="badge b-err">●</span> Urgent</span>
+      <span><span class="badge b-ok">●</span> AG</span>
+      <span><span class="badge b-pur">●</span> Journal</span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="ct">Ajouter un événement</div>
+    <div class="fr"><div><label>Date</label><input id="ev-dt" type="date"/></div><div><label>Type</label><select id="ev-type"><option value="info">Information</option><option value="warn">Échéance</option><option value="err">Urgent</option><option value="ok">AG</option></select></div></div>
+    <label>Libellé</label><input id="ev-lbl" placeholder="Réunion, démarche..."/>
+    <div class="ab"><button class="btn btn-p" onclick="addEvent()">Ajouter</button></div>
+  </div>
+</div>
+
+<!-- JOURNAL -->
+<div id="journal" class="sec">
+  <div class="sec-hd"><h2>Journal de bord</h2><p>Traçabilité des actions et décisions quotidiennes</p></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Nouvelle entrée</div>
+      <label>Date & heure</label><input id="jou-dt" type="datetime-local"/>
+      <label>Catégorie</label><select id="jou-cat"></select>
+      <label>Interlocuteur</label><input id="jou-inter" placeholder="M. Dupont, Entreprise Rossi..."/>
+      <label>Contenu</label><textarea id="jou-txt" placeholder="Description de l'action, décision, appel..."></textarea>
+      <div class="ab"><button class="btn btn-p" onclick="addJournal()">Enregistrer</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Historique</div>
+      <input id="jou-search" placeholder="Rechercher..." oninput="renderJournal()" style="margin-bottom:8px"/>
+      <div id="jou-list"><div class="es">Aucune entrée.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- COPROPRIÉTAIRES -->
+<div id="copros" class="sec">
+  <div class="sec-hd"><h2>Registre des copropriétaires</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct" id="form-cop-t">Ajouter un copropriétaire</div>
+      <div class="fr"><div><label>Nom</label><input id="cp-nom" placeholder="Dupont"/></div><div><label>Prénom</label><input id="cp-pre" placeholder="Marie"/></div></div>
+      <div class="fr"><div><label>Téléphone</label><input id="cp-tel" placeholder="06 12 34 56 78"/></div><div><label>Email</label><input id="cp-email" placeholder="marie@mail.fr"/></div></div>
+      <label>Type d'occupation</label><select id="cp-occ"></select>
+      <label>Notes</label><textarea id="cp-notes" placeholder="Infos complémentaires..."></textarea>
+      <div class="hr" style="margin:12px 0"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="ct" style="margin-bottom:0">Lots détenus</div>
+        <button class="btn btn-sm btn-p" onclick="addCopLotRow()">+ Ajouter un lot</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Un copropriétaire peut détenir plusieurs lots (cave, parking, appartement…)</div>
+      <div id="cp-lots-rows"></div>
+      <input type="hidden" id="cp-idx" value="-1">
+      <div class="ab"><button class="btn btn-p" onclick="saveCop()">Enregistrer</button><button class="btn" onclick="resetCop()">Annuler</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Registre (<span id="cop-count">0</span>)</div>
+      <div id="cop-table"><div class="es">Aucun copropriétaire.</div></div>
+      <div class="hint">Total tantièmes : <strong id="cop-tan-total">0</strong>/10000</div>
+    </div>
+  </div>
+</div>
+
+<!-- APPELS DE FONDS -->
+<div id="charges" class="sec">
+  <div class="sec-hd"><h2>Appels de fonds</h2><p>Créez plusieurs appels simultanés, suivez les paiements par copropriétaire</p></div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct" id="appel-form-title">Nouvel appel de fonds</div>
+    <div class="fr">
+      <div><label>Intitulé de l'appel</label><input id="apl-titre" placeholder="Appel T1 2025, Appel travaux ravalement..."/></div>
+      <div><label>Date d'émission</label><input id="apl-emission" type="date"/></div>
+    </div>
+    <div class="fr">
+      <div><label>Date d'échéance</label><input id="apl-echeance" type="date"/></div>
+      <div><label>Notes générales</label><input id="apl-notes" placeholder="Précisions..."/></div>
+    </div>
+    <div class="hr"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="ct" style="margin-bottom:0">Lignes de charges</div>
+      <button class="btn btn-sm btn-p" onclick="addLigne()">+ Ajouter une ligne</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">La répartition se calcule selon les tantièmes de la clé choisie.</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 100px 32px;gap:8px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);padding:0 2px;margin-bottom:4px">
+      <div>Nature de la charge</div><div>Montant total (€)</div><div>Clé de répartition</div><div>Période</div><div></div>
+    </div>
+    <div id="apl-lignes"></div>
+    <div id="apl-total" style="text-align:right;font-size:12px;color:var(--text2);margin-top:6px"></div>
+    <div class="hr"></div>
+    <div id="apl-preview" style="display:none">
+      <div class="ct">Prévisualisation — Montants par copropriétaire</div>
+      <div id="apl-preview-table"></div>
+      <div class="hr"></div>
+    </div>
+    <div class="ab">
+      <button class="btn btn-p" onclick="previewAppel()">Prévisualiser la répartition</button>
+      <button class="btn btn-g" onclick="createAppel()">Créer l'appel ↗</button>
+      <input type="hidden" id="apl-edit-idx" value="-1">
+    </div>
+  </div>
+  <div id="appels-list"><div class="es">Aucun appel de fonds créé.</div></div>
+  <div class="card" id="appel-detail" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div class="ct" id="detail-titre" style="margin-bottom:0;flex:1">Détail de l'appel</div>
+      <button class="btn btn-sm" onclick="G('appel-detail').style.display='none'">Fermer</button>
+      <button class="btn btn-sm" onclick="exportAppelCSV()">CSV</button>
+      <button class="btn btn-sm btn-p" onclick="exportAppelDocx()">⬇ Word</button>
+      <button class="btn btn-sm btn-p" onclick="exportAppelPdf()" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)">⬇ PDF</button>
+      <button class="btn btn-sm" onclick="printAppel()">Imprimer</button>
+    </div>
+    <div id="detail-summary" style="margin-bottom:12px"></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Lot</th><th>Copropriétaire</th><th>Tant.</th><th id="detail-col-headers"></th><th>Total dû</th><th>Payé</th><th>Reste</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody id="detail-tbody"></tbody>
+      </table>
+    </div>
+    <div class="hint" style="margin-top:8px" id="detail-foot"></div>
+  </div>
+</div>
+
+<!-- FICHES APPEL DE FOND PAR COPROPRIÉTAIRE -->
+<div id="fiches" class="sec">
+  <div class="sec-hd"><h2>Fiches d'appel de fonds par copropriétaire</h2><p>Générez une fiche individuelle d'appel de fonds pour chaque copropriétaire</p></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:180px">
+        <label>Appel de fonds</label>
+        <select id="fiche-appel-sel" onchange="renderFiches()">
+          <option value="">-- Choisir un appel --</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:180px">
+        <label>Copropriétaire</label>
+        <select id="fiche-cop-sel" onchange="renderFicheUnique()">
+          <option value="">-- Tous les copropriétaires --</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-top:18px;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="exportFicheDocx()">⬇ Word (sélection)</button>
+        <button class="btn btn-p" onclick="exportFichePdf()" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)">⬇ PDF (sélection)</button>
+        <button class="btn btn-g" onclick="exportToutesFiches()">⬇ Toutes (Word)</button>
+        <button class="btn" onclick="printFiches()">Imprimer</button>
+      </div>
+    </div>
+  </div>
+  <div id="fiches-container"><div class="es">Sélectionnez un appel de fonds pour afficher les fiches.</div></div>
+</div>
+
+<!-- RELEVÉ DE SITUATION -->
+<div id="releve" class="sec">
+  <div class="sec-hd"><h2>Relevés de situation comptable</h2><p>Historique complet de chaque copropriétaire — appels, paiements, solde</p></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <label>Sélectionner un copropriétaire</label>
+        <select id="releve-select" onchange="renderReleve()">
+          <option value="">-- Choisissez un copropriétaire --</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-top:18px">
+        <button class="btn btn-p" onclick="exportReleveDocx()">⬇ Word (.docx)</button><button class="btn btn-p" onclick="exportRelevePdf()" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)">⬇ PDF</button>
+        <button class="btn" onclick="printReleve()">Imprimer</button>
+        <button class="btn" onclick="exportTousReleves()">⬇ Tous les relevés</button>
+      </div>
+    </div>
+  </div>
+  <div class="g4" id="releve-metrics" style="display:none">
+    <div class="metric"><div class="ml">Total appelé</div><div class="mv" id="rel-total">0 €</div><div class="ms">toutes périodes</div></div>
+    <div class="metric"><div class="ml">Total payé</div><div class="mv" id="rel-paye" style="color:#63a020">0 €</div><div class="ms">versements reçus</div></div>
+    <div class="metric"><div class="ml">Solde dû</div><div class="mv" id="rel-solde" style="color:#e24b4a">0 €</div><div class="ms">reste à recouvrer</div></div>
+    <div class="metric"><div class="ml">Taux de paiement</div><div class="mv" id="rel-taux">— %</div><div class="ms">sur l'ensemble</div></div>
+  </div>
+  <div class="card" id="releve-detail" style="display:none">
+    <div class="ct" id="releve-titre">Relevé de situation</div>
+    <div id="releve-body"></div>
+    <div class="hr"></div>
+    <div id="releve-footer" style="font-size:12px;color:var(--text2)"></div>
+  </div>
+  <div id="releve-empty" class="card">
+    <div class="es">Sélectionnez un copropriétaire pour afficher son relevé.</div>
+  </div>
+</div>
+
+<!-- CLÉS DE RÉPARTITION -->
+<div id="repartition" class="sec">
+  <div class="sec-hd"><h2>Clés de répartition</h2><p>Définissez les clés de répartition et affectez les tantièmes par lot</p></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct" id="cle-rep-form-title">Créer une clé de répartition</div>
+      <label>Nom de la clé</label><input id="crep-nom" placeholder="Tantièmes généraux, Eau, Ascenseur..."/>
+      <label>Total de référence</label><input id="crep-total" type="number" placeholder="10000" value="10000"/>
+      <label>Description / usage</label><textarea id="crep-desc" placeholder="À quoi sert cette clé ? Quelles charges ?"></textarea>
+      <input type="hidden" id="crep-idx" value="-1">
+      <div class="ab">
+        <button class="btn btn-p" onclick="saveCleRep()">Enregistrer</button>
+        <button class="btn" onclick="resetCleRep()">Annuler</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Récapitulatif des tantièmes</div>
+      <div id="crep-synth"><div class="es">Aucune clé définie.</div></div>
+    </div>
+  </div>
+  <!-- Tableau de répartition par lot et par clé -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div class="ct" style="margin-bottom:0;flex:1">Tableau de répartition — Tantièmes par lot et par clé</div>
+      <button class="btn btn-sm btn-p" onclick="exportRepartitionDocx()">⬇ Word</button>
+      <button class="btn btn-sm" onclick="exportRepartitionPdf()" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)">⬇ PDF</button>
+      <button class="btn btn-sm" onclick="exportRepartitionCSV()">CSV</button>
+    </div>
+    <div style="overflow-x:auto"><div id="crep-table"><div class="es">Aucune clé de répartition définie.</div></div></div>
+  </div>
+  <!-- Liste des clés -->
+  <div id="crep-list-container" style="margin-top:14px"></div>
+</div>
+
+<!-- LOTS DU BÂTIMENT -->
+<div id="lots" class="sec">
+  <div class="sec-hd"><h2>Lots du bâtiment</h2><p>Registre de tous les lots — référence, surface, tantièmes, destination</p></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct" id="lot-form-title">Créer un lot</div>
+      <div class="fr"><div><label>N° de lot</label><input id="lot-num" type="number" placeholder="1"/></div><div><label>Référence cadastrale</label><input id="lot-ref" placeholder="B12, 3A..."/></div></div>
+      <div class="fr"><div><label>Type de lot</label><select id="lot-type"></select></div><div><label>Étage</label><select id="lot-etage"></select></div></div>
+      <div class="fr"><div><label>Surface (m²)</label><input id="lot-surf" type="number" placeholder="45" step="0.1"/></div><div><label>Tantièmes généraux</label><input id="lot-tan" type="number" placeholder="850"/></div></div>
+      <label>Description / notes</label><textarea id="lot-desc" placeholder="Appartement T3, cave n°5, parking intérieur..."></textarea>
+      <div class="al al-i" style="margin-top:10px;font-size:11px">Les tantièmes spécialisés (eau, ascenseur...) se gèrent dans l'onglet <strong>Clés de répartition</strong>.</div>
+      <input type="hidden" id="lot-idx" value="-1">
+      <div class="ab"><button class="btn btn-p" onclick="saveLot()">Enregistrer</button><button class="btn" onclick="resetLot()">Annuler</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Récapitulatif</div>
+      <div id="lot-totaux" style="margin-bottom:12px"></div>
+      <div class="al al-i" id="lot-alerte-tan" style="display:none"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="ct" style="margin-bottom:0;flex:1">Registre des lots (<span id="lot-count">0</span>)</div>
+      <input id="lot-search" placeholder="Rechercher..." style="width:180px" oninput="renderLots()"/>
+    </div>
+    <div id="lot-table"><div class="es">Aucun lot enregistré.</div></div>
+  </div>
+</div>
+
+<!-- BUDGET -->
+<div id="budget" class="sec">
+  <div class="sec-hd"><h2>Budget prévisionnel</h2><p>Comptes conformes au plan comptable (décret 2005-240)</p></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Ajouter un poste</div>
+      <label>Intitulé</label><input id="bud-p" placeholder="Entretien ascenseur, prime assurance..."/>
+      <div class="fr"><div><label>Prévu (€)</label><input id="bud-pr" type="number" placeholder="2400"/></div><div><label>Réel (€)</label><input id="bud-re" type="number" placeholder="0"/></div></div>
+      <div class="fr">
+        <div>
+          <label>Compte comptable</label>
+          <select id="bud-compte" onchange="autoFillBudCat()">
+            <option value="">-- Choisir un compte --</option>
+            <optgroup label="Classe 6 — Charges courantes">
+              <option value="601">601 — Achats (produits entretien)</option>
+              <option value="611">611 — Entretien et réparations</option>
+              <option value="615">615 — Entretien biens immobiliers</option>
+              <option value="616">616 — Primes d'assurance</option>
+              <option value="621">621 — Personnel extérieur</option>
+              <option value="622">622 — Rémunérations d'intermédiaires</option>
+              <option value="626">626 — Frais postaux</option>
+              <option value="628">628 — Divers (eau, énergie PC...)</option>
+              <option value="631">631 — Impôts et taxes</option>
+              <option value="641">641 — Rémunérations du personnel</option>
+              <option value="645">645 — Charges sociales</option>
+            </optgroup>
+            <optgroup label="Charges exceptionnelles et travaux">
+              <option value="671">671 — Charges exceptionnelles</option>
+              <option value="672">672 — Travaux votés en AG</option>
+            </optgroup>
+            <optgroup label="Fonds travaux (art. 14-2 ALUR)">
+              <option value="103">103 — Fonds de travaux (5%)</option>
+            </optgroup>
+            <optgroup label="Produits — Classe 7">
+              <option value="701">701 — Appels de charges courantes</option>
+              <option value="702">702 — Appels travaux</option>
+              <option value="703">703 — Appels fonds de travaux</option>
+              <option value="758">758 — Produits divers</option>
+            </optgroup>
+          </select>
+        </div>
+        <div><label>Année</label><input id="bud-an" type="number" placeholder="2025"/></div>
+      </div>
+      <label>Catégorie (auto)</label><select id="bud-cat"></select>
+      <div class="ab"><button class="btn btn-p" onclick="addBudget()">Ajouter</button></div>
+    </div>
+    <div class="card"><div class="ct">Synthèse par classe</div><div id="bud-synth"><div class="es">Aucun poste.</div></div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+      <div class="ct" style="margin-bottom:0;flex:1">Détail des postes</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--text2);margin:0">Année :</label>
+        <select id="bud-filtre-an" onchange="renderBudget()" style="width:110px"><option value="">Toutes</option></select>
+      </div>
+      <button class="btn btn-sm btn-p" onclick="showImportContrats()" title="Importer les montants des contrats actifs en un clic" style="display:flex;align-items:center;gap:5px">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10h14m-5-5l5 5-5 5"/></svg>
+        Importer contrats
+      </button>
+      <button class="btn btn-sm" onclick="exportBudgetWord()" style="display:flex;align-items:center;gap:5px">⬇ Word</button>
+      <button class="btn btn-sm" onclick="exportBudgetPdf(G('bud-filtre-an').value||null)" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border);display:flex;align-items:center;gap:5px">⬇ PDF</button>
+    </div>
+    <div id="bud-list"><div class="es">Aucun poste.</div></div>
+  </div>
+</div>
+
+<!-- FONDS TRAVAUX -->
+<div id="fonds" class="sec">
+  <div class="sec-hd"><h2>Fonds travaux (art. 14-2 ALUR)</h2></div>
+  <div id="ft-synthese" class="al al-i" style="margin-bottom:12px"></div>
+  <div class="g4">
+    <div class="metric"><div class="ml">Solde</div><div class="mv" id="ft-solde" style="color:#63a020">0 €</div><div class="ms">disponible</div></div>
+    <div class="metric"><div class="ml">Provisions</div><div class="mv" id="ft-prov">0 €</div><div class="ms">appelées</div></div>
+    <div class="metric"><div class="ml">Dépenses</div><div class="mv" id="ft-dep">0 €</div><div class="ms">affectées</div></div>
+    <div class="metric"><div class="ml">Taux légal min.</div><div class="mv">5 %</div><div class="ms">du budget voté</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Enregistrer une opération</div>
+      <label>Type</label><select id="ft-type"><option value="provision">Provision appelée (recette)</option><option value="depense">Dépense affectée (sortie)</option></select>
+      <div class="fr"><div><label>Montant (€)</label><input id="ft-mnt" type="number" placeholder="500"/></div><div><label>Date</label><input id="ft-dt" type="date"/></div></div>
+      <label>Description</label><textarea id="ft-desc" placeholder="Ravalement, remplacement chaudière..."></textarea>
+      <div class="ab"><button class="btn btn-p" onclick="addFonds()">Enregistrer</button></div>
+      <div class="al al-i" style="margin-top:12px">Provision annuelle minimum légale : 5% du budget prévisionnel voté en AG.</div>
+    </div>
+    <div class="card"><div class="ct">Historique</div><div id="ft-list"><div class="es">Aucune opération.</div></div></div>
+  </div>
+</div>
+
+<!-- SINISTRES -->
+<div id="sinistres" class="sec">
+  <div class="sec-hd"><h2>Gestion des sinistres</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Déclarer un sinistre</div>
+      <div class="fr"><div><label>Nature</label><select id="sin-nat"></select></div><div><label>Date</label><input id="sin-dt" type="date"/></div></div>
+      <label>Localisation</label><input id="sin-loc" placeholder="Cage d'escalier, Lot n°5..."/>
+      <label>Description</label><textarea id="sin-desc" placeholder="Description détaillée..."></textarea>
+      <div class="fr"><div><label>Assureur</label><input id="sin-ass" placeholder="Groupama, AXA..."/></div><div><label>N° de police</label><input id="sin-pol" placeholder="XXXXX"/></div></div>
+      <div class="fr"><div><label>N° dossier sinistre</label><input id="sin-dos" placeholder="Attribué par l'assureur"/></div><div><label>Expert mandaté</label><input id="sin-exp" placeholder="Nom"/></div></div>
+      <label>Préjudice estimé (€)</label><input id="sin-mnt" type="number" placeholder="0"/>
+      <label>Statut</label><select id="sin-sta"></select>
+      <div class="ab"><button class="btn btn-p" onclick="addSinistre()">Enregistrer</button></div>
+    </div>
+    <div class="card"><div class="ct">Sinistres en cours</div><div id="sin-list"><div class="es">Aucun sinistre.</div></div></div>
+  </div>
+</div>
+
+<!-- LOCATIONS -->
+<div id="locations" class="sec">
+  <div class="sec-hd"><h2>Locations de parties communes</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Ajouter une location</div>
+      <div class="fr"><div><label>Type</label><select id="loc-type"></select></div><div><label>Référence</label><input id="loc-ref" placeholder="Parking n°3"/></div></div>
+      <div class="fr"><div><label>Locataire</label><input id="loc-loc" placeholder="M. Dupont"/></div><div><label>Téléphone</label><input id="loc-tel" placeholder="06..."/></div></div>
+      <div class="fr"><div><label>Loyer mensuel (€)</label><input id="loc-loy" type="number" placeholder="50"/></div><div><label>Dépôt garantie (€)</label><input id="loc-dep" type="number" placeholder="100"/></div></div>
+      <div class="fr"><div><label>Début du bail</label><input id="loc-deb" type="date"/></div><div><label>Fin du bail</label><input id="loc-fin" type="date"/></div></div>
+      <div class="ab"><button class="btn btn-p" onclick="addLocation()">Ajouter</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Locations</div>
+      <div id="loc-list"><div class="es">Aucune location.</div></div>
+      <div class="hr"></div>
+      <div class="ct">Suivi des paiements</div>
+      <div id="loc-paie"><div class="es">Cliquez sur "Suivi" pour une location.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BÂTIMENT -->
+<div id="batiment" class="sec">
+  <div class="sec-hd"><h2>Carnet d'entretien du bâtiment</h2></div>
+  <div class="al al-i" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="flex:1">Les coûts des interventions alimentent automatiquement les statistiques. Enregistrez une dépense correspondante dans le <strong>Fonds travaux</strong> ou le <strong>Budget</strong> pour une comptabilité complète.</span>
+    <button class="btn btn-sm btn-p" onclick="T(&apos;fonds&apos;)">→ Fonds travaux</button>
+    <button class="btn btn-sm btn-p" onclick="T(&apos;budget&apos;)">→ Budget</button>
+  </div>
+  <div class="al al-w" id="bat-sync-banner" style="display:none;margin-bottom:12px;font-size:12px">
+    ⚠ Des interventions ont un coût non encore reporté dans le fonds travaux ou le budget. <button class="btn btn-sm" style="margin-left:8px" onclick="T(&apos;fonds&apos;)">Saisir dans Fonds travaux</button>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Nouvelle intervention</div>
+      <div class="fr"><div><label>Type</label><select id="bat-type"></select></div><div><label>Date</label><input id="bat-dt" type="date"/></div></div>
+      <label>Localisation</label><select id="bat-loc"></select>
+      <label>Description</label><textarea id="bat-desc" placeholder="Détail de l'intervention..."></textarea>
+      <div class="fr"><div><label>Coût (€)</label><input id="bat-cout" type="number" placeholder="0"/></div><div><label>Intervenant</label><input id="bat-int" placeholder="Plombier Rossi"/></div></div>
+      <label>Statut</label><select id="bat-sta"></select>
+      <div class="ab"><button class="btn btn-p" onclick="addIntervention()">Enregistrer</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Contrôles réglementaires</div>
+      <div class="al al-w"><strong>Extincteurs</strong> — annuel<br><button class="btn btn-sm" style="margin-top:5px" onclick="addCtrl('Vérification extincteurs')">Marquer effectué</button></div>
+      <div class="al al-w"><strong>Électricité parties communes</strong> — tous les 5 ans<br><button class="btn btn-sm" style="margin-top:5px" onclick="addCtrl('Vérification électrique parties communes')">Marquer effectué</button></div>
+      <div class="al al-w"><strong>Amiante (avant 1997)</strong> — DTA à maintenir<br><button class="btn btn-sm" style="margin-top:5px" onclick="addCtrl('Mise à jour DTA amiante')">Marquer effectué</button></div>
+      <div class="al al-i"><strong>Ascenseur</strong> — contrat entretien + contrôle 5 ans</div>
+    </div>
+  </div>
+  <div class="card"><div class="ct">Historique</div><div id="bat-list"><div class="es">Aucune intervention.</div></div></div>
+</div>
+
+<!-- PRESTATAIRES -->
+<div id="prestataires" class="sec">
+  <div class="sec-hd"><h2>Prestataires & contrats</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Ajouter un prestataire</div>
+      <div class="fr"><div><label>Société / Nom</label><input id="pr-nom" placeholder="Plomberie Rossi"/></div><div><label>Spécialité</label><select id="pr-spe"></select></div></div>
+      <div class="fr"><div><label>Téléphone</label><input id="pr-tel" placeholder="04 95..."/></div><div><label>Email</label><input id="pr-email" placeholder="contact@..."/></div></div>
+      <div class="fr"><div><label>Début contrat</label><input id="pr-deb" type="date"/></div><div><label>Fin / renouvellement</label><input id="pr-fin" type="date"/></div></div>
+      <div class="fr"><div><label>Montant annuel (€)</label><input id="pr-mnt" type="number" placeholder="0"/></div><div><label>N° contrat / police</label><input id="pr-ref" placeholder="XXXXX"/></div></div>
+      <label>Statut</label><select id="pr-sta"></select>
+      <label>Notes</label><textarea id="pr-notes" placeholder="Conditions particulières..."></textarea>
+      <div class="ab"><button class="btn btn-p" onclick="addPrest()">Ajouter</button></div>
+    </div>
+    <div class="card"><div class="ct">Contrats</div><div id="pr-list"><div class="es">Aucun prestataire.</div></div></div>
+  </div>
+</div>
+
+<!-- CLÉS & BADGES -->
+<div id="cles" class="sec">
+  <div class="sec-hd"><h2>Clés & badges d'accès</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Enregistrer une remise</div>
+      <div class="fr"><div><label>Type</label><select id="cle-type"></select></div><div><label>Référence</label><input id="cle-ref" placeholder="Badge #12, Clé A..."/></div></div>
+      <div class="fr"><div><label>Remis à</label><input id="cle-dest" placeholder="Nom du bénéficiaire"/></div><div><label>Lot</label><select id="cle-lot-sel"><option value="">-- Lot --</option></select></div></div>
+      <div class="fr"><div><label>Date de remise</label><input id="cle-drem" type="date"/></div><div><label>Caution (€)</label><input id="cle-cau" type="number" placeholder="0"/></div></div>
+      <label>Statut</label><select id="cle-sta"></select>
+      <label>Notes</label><input id="cle-notes" placeholder="Duplicata, conditions..."/>
+      <div class="ab"><button class="btn btn-p" onclick="addCle()">Enregistrer</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Registre</div>
+      <div id="cle-list"><div class="es">Aucun accès enregistré.</div></div>
+      <div class="hr"></div>
+      <div id="cle-stats" style="font-size:12px;color:var(--text2)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AG -->
+<div id="ag" class="sec">
+  <div class="sec-hd"><h2>Assemblée générale</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Paramètres de l'assemblée</div>
+      <div class="fr"><div><label>Date</label><input id="ag-dt" type="date" onchange="saveAG()"/></div><div><label>Heure</label><input id="ag-h" type="time" value="18:00" onchange="saveAG()"/></div></div>
+      <label>Lieu</label><input id="ag-lieu" placeholder="Salle commune..." onchange="saveAG()"/>
+      <label>Type</label><select id="ag-type" onchange="saveAG()"><option>Assemblée générale ordinaire</option><option>Assemblée générale extraordinaire</option></select>
+      <div class="hr"></div>
+      <div class="ct">Ordre du jour</div>
+      <div id="ag-odj-list" style="margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px"><input id="ag-odj-in" placeholder="Ajouter un point..." style="flex:1" onkeydown="if(event.key==='Enter')addOdj()"/><button class="btn" onclick="addOdj()">+</button></div>
+      <div class="ab"><button class="btn btn-p" onclick="genConv()">Convocation</button><button class="btn" onclick="genPV()">PV</button><button class="btn" onclick="genFeuille()">Feuille présence</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Document</div>
+      <div class="doc" id="ag-doc">Configurez puis cliquez sur un bouton.</div>
+      <div class="ab"><button class="btn" onclick="copyDoc('ag-doc')">Copier</button><button class="btn" onclick="printDoc('ag-doc')">Imprimer</button><button class="btn btn-p" onclick="exportAGDocx()">⬇ Word</button><button class="btn btn-p" onclick="exportAGPdf()" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)">⬇ PDF</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Historique des AG</div>
+    <table><thead><tr><th>Date</th><th>Type</th><th>Résolutions</th><th>Notes</th><th></th></tr></thead>
+    <tbody id="ag-hist"><tr><td colspan="5" class="es">Aucune AG archivée.</td></tr></tbody></table>
+    <div class="ab"><button class="btn btn-p" onclick="archiveAG()">Archiver l'AG en cours</button></div>
+  </div>
+</div>
+
+<!-- COURRIERS -->
+<div id="courriers" class="sec">
+  <div class="sec-hd"><h2>Générateur de courriers</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Paramètres</div>
+      <label>Type</label>
+      <select id="co-type">
+        <option value="relance1">Relance 1 — charges (amiable)</option>
+        <option value="relance2">Relance 2 — charges (formelle)</option>
+        <option value="demise">Mise en demeure</option>
+        <option value="convoc">Convocation AG</option>
+        <option value="travaux">Notification travaux</option>
+        <option value="sinistre">Déclaration sinistre assurance</option>
+        <option value="nuisances">Signalement nuisances</option>
+        <option value="bienvenue">Bienvenue nouveau copropriétaire</option>
+      </select>
+      <label>Destinataire</label>
+      <select id="co-dest-cop" onchange="autoFillCourrierDest()" style="margin-bottom:6px"><option value="">-- Copropriétaire (optionnel) --</option></select>
+      <input id="co-dest" placeholder="Ou saisir manuellement : M. / Mme Dupont, Lot n°12"/>
+      <label>Détails spécifiques</label><textarea id="co-det" placeholder="Montant, date, description..."></textarea>
+      <label>Date du courrier</label><input id="co-dt" type="date"/>
+      <div class="ab"><button class="btn btn-p" onclick="genCourrier()">Générer</button></div>
+    </div>
+    <div class="card">
+      <div class="ct">Aperçu</div>
+      <div class="doc" id="co-prev">Sélectionnez un type et cliquez sur "Générer".</div>
+      <div class="ab"><button class="btn" onclick="copyDoc('co-prev')">Copier</button><button class="btn" onclick="printDoc('co-prev')">Imprimer</button><button class="btn btn-p" onclick="exportCourrierDocx()">⬇ Word</button><button class="btn btn-p" onclick="exportCourrierPdf()" style="background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)">⬇ PDF</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- URGENCES -->
+<div id="urgence" class="sec">
+  <div class="sec-hd"><h2>Annuaire d'urgence</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Services d'urgence</div>
+      <div class="urg-card"><div class="urg-icon" style="background:#fce7e7"><svg viewBox="0 0 20 20" fill="none" stroke="#c0392b" stroke-width="1.5"><path d="M10 3l7 12H3z"/><path d="M10 8v4m0 2v.5"/></svg></div><div><div style="font-size:11px;color:var(--text2)">SAMU</div><div class="urg-tel">15</div></div></div>
+      <div class="urg-card"><div class="urg-icon" style="background:#fce7e7"><svg viewBox="0 0 20 20" fill="none" stroke="#c0392b" stroke-width="1.5"><path d="M10 3l7 12H3z"/><path d="M10 8v4m0 2v.5"/></svg></div><div><div style="font-size:11px;color:var(--text2)">Pompiers</div><div class="urg-tel">18</div></div></div>
+      <div class="urg-card"><div class="urg-icon" style="background:#fce7e7"><svg viewBox="0 0 20 20" fill="none" stroke="#c0392b" stroke-width="1.5"><path d="M6 3h2l1 4-2 1.5a10 10 0 0 0 4.5 4.5L13 11l4 1v2a2 2 0 0 1-2 2C7 16 4 9 4 5a2 2 0 0 1 2-2z"/></svg></div><div><div style="font-size:11px;color:var(--text2)">Police / Gendarmerie</div><div class="urg-tel">17</div></div></div>
+      <div class="urg-card"><div class="urg-icon" style="background:#e3f0fc"><svg viewBox="0 0 20 20" fill="none" stroke="#1565c0" stroke-width="1.5"><path d="M6 3h2l1 4-2 1.5a10 10 0 0 0 4.5 4.5L13 11l4 1v2a2 2 0 0 1-2 2C7 16 4 9 4 5a2 2 0 0 1 2-2z"/></svg></div><div><div style="font-size:11px;color:var(--text2)">Urgences européen</div><div class="urg-tel">112</div></div></div>
+      <div class="urg-card"><div class="urg-icon" style="background:#eaf3de"><svg viewBox="0 0 20 20" fill="none" stroke="#3b6d11" stroke-width="1.5"><path d="M3 10h14M10 3v14"/></svg></div><div><div style="font-size:11px;color:var(--text2)">Mairie d'Ajaccio</div><div class="urg-tel">04 95 51 52 53</div></div></div>
+    </div>
+    <div class="card">
+      <div class="ct">Contacts de la copropriété</div>
+      <div id="urg-list"><div class="es">Aucun contact ajouté.</div></div>
+      <div class="hr"></div>
+      <div class="ct">Ajouter un contact</div>
+      <div class="fr"><div><label>Nom / Société</label><input id="urg-nom" placeholder="Plombier Rossi"/></div><div><label>Rôle</label><input id="urg-role" placeholder="Plombier urgence"/></div></div>
+      <div class="fr"><div><label>Téléphone</label><input id="urg-tel" placeholder="06 12 34 56 78"/></div><div><label>Disponibilité</label><select id="urg-dispo"><option>Heures ouvrées</option><option>7j/7 — 24h/24</option><option>Astreinte</option><option>Sur RDV</option></select></div></div>
+      <label>Notes</label><input id="urg-notes" placeholder="Tarifs, spécialité..."/>
+      <div class="ab"><button class="btn btn-p" onclick="addUrgence()">Ajouter</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARAMÈTRES -->
+<div id="parametres" class="sec">
+  <div class="sec-hd"><h2>Paramètres</h2><p>Logo, listes personnalisables et préférences</p></div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="ct">Logo du syndic</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Le logo apparaîtra dans l'en-tête et sur tous les documents exportés.</p>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div id="logo-preview-wrap" style="display:none;background:var(--bg2);border-radius:var(--radius);padding:10px;border:.5px solid var(--border)">
+        <img id="logo-preview" src="" alt="Logo" style="max-height:80px;max-width:200px;object-fit:contain"/>
+      </div>
+      <div id="logo-placeholder" style="width:120px;height:60px;background:var(--bg2);border:.5px dashed var(--border2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px">Aucun logo</div>
+      <div>
+        <div class="ab" style="margin-top:0">
+          <label class="btn btn-p" style="cursor:pointer">Choisir un logo (PNG, JPG)<input type="file" accept="image/png,image/jpeg,image/gif,image/webp" onchange="uploadLogo(event)" style="display:none"/></label>
+          <button class="btn btn-d" onclick="removeLogo()" id="logo-del-btn" style="display:none">Supprimer</button>
+        </div>
+        <div class="hint" style="margin-top:6px">Formats : PNG, JPG, GIF, WEBP · Max 400×150 px recommandé</div>
+      </div>
+    </div>
+  </div>
+  <div class="sec-hd" style="margin-bottom:10px"><h2 style="font-size:14px">Listes personnalisables</h2><p>Ajoutez, modifiez ou supprimez les valeurs de chaque liste déroulante</p></div>
+  <div id="param-grid" class="g2"></div>
+</div>
+
+<!-- DONNÉES -->
+<div id="donnees" class="sec">
+  <div class="sec-hd"><h2>Mes données</h2></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Sauvegarde locale</div>
+      <div class="al al-ok">Sauvegarde automatique à chaque modification.</div>
+      <p style="font-size:12px;color:var(--text2);margin-top:10px">Exportez régulièrement en JSON sur clé USB ou disque dur.</p>
+      <div class="ab">
+        <button class="btn btn-p" onclick="exportData()">Exporter (JSON)</button>
+        <label class="btn" style="cursor:pointer">Importer fichier<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
+        <button class="btn" onclick="T('donnees-coller')">Coller JSON</button>
+      </div>
+    </div>
+    <div class="card"><div class="ct">Statistiques</div><div id="stats-list"></div></div>
+  </div>
+  <div class="card"><div class="ct">Réinitialisation</div><p style="font-size:12px;color:var(--text2);margin-bottom:10px">Irréversible — exportez d'abord.</p><button class="btn btn-d" onclick="clearAll()">Effacer toutes les données</button></div>
+</div>
+
+<!-- COLLER JSON -->
+<div id="donnees-coller" class="sec">
+  <div class="sec-hd"><h2>Importer par copier-coller</h2></div>
+  <div class="card">
+    <div class="al al-i" style="margin-bottom:12px"><strong>Mode d'emploi :</strong> Ouvrez votre fichier <code>.json</code>, sélectionnez tout (<kbd>Ctrl+A</kbd>), copiez (<kbd>Ctrl+C</kbd>), collez ci-dessous.</div>
+    <label>Collez votre JSON ici</label>
+    <textarea id="json-paste" placeholder='{"immeuble":{"nom":"..."},"copros":[...],...}' style="min-height:220px;font-family:monospace;font-size:12px"></textarea>
+    <div class="ab">
+      <button class="btn btn-p" onclick="importFromPaste()">Charger ces données</button>
+      <button class="btn" onclick="G('json-paste').value=''">Effacer</button>
+      <button class="btn" onclick="exportJsonToClipboard()">Copier mes données</button>
+    </div>
+    <div id="paste-status" style="margin-top:10px;font-size:12px"></div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT CONTRATS -->
+<div id="modal-contrats" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border-radius:var(--radius-lg);padding:22px;width:min(640px,95vw);max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="display:flex;align-items:center;margin-bottom:16px">
+      <strong style="font-size:15px;flex:1">Importer les contrats dans le budget</strong>
+      <button class="del" onclick="closeModalContrats()" style="font-size:18px">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Sélectionnez les contrats actifs à importer. Chaque contrat crée un poste de budget avec son montant annuel. Si un poste identique existe déjà, il sera ignoré.</p>
+    <div class="fr" style="margin-bottom:12px">
+      <div><label>Année cible</label><input id="import-contrat-an" type="number" placeholder="2025"/></div>
+      <div style="display:flex;align-items:flex-end"><button class="btn btn-sm" onclick="selectAllContrats()">Tout sélectionner</button></div>
+    </div>
+    <div id="modal-contrats-list" style="margin-bottom:16px"></div>
+    <div class="ab">
+      <button class="btn btn-p" onclick="doImportContrats()">Importer la sélection</button>
+      <button class="btn" onclick="closeModalContrats()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ─── ÉTAT GLOBAL ───────────────────────────────────────────────────
+var S={
+  immeuble:{nom:'',adr:'',lots:'',an:'',syn:'',rib:'',banque:'',domiciliation:''},
+  copros:[],appels:[],budget:[],interventions:[],prestataires:[],
+  fonds:[],sinistres:[],locations:[],cles:[],journal:[],urgences:[],events:[],
+  lots_bat:[],  // lots du bâtiment
+  cles_rep:[],  // clés de répartition
+  ag:{dt:'',h:'18:00',lieu:'',type:'Assemblée générale ordinaire',odj:[]},
+  ag_hist:[],
+  listes:{
+    etages:['RDC','1er','2e','3e','4e','5e','6e'],
+    occupations:['Résidence principale','Résidence secondaire','Bailleur (location)','Local commercial'],
+    natures_charges:['Charges courantes','Fonds travaux','Charges exceptionnelles','Eau collective','Entretien parties communes','Assurance','Ravalement','Ascenseur','Ménage','Gardiennage'],
+    cles_repartition:['Tantièmes généraux (1000e)','Tantièmes eau','Tantièmes ascenseur','Tantièmes escalier'],
+    types_lot:['Appartement','Studio','Local commercial','Cave','Parking','Box','Grenier','Autre'],
+    types_intervention:['Entretien courant','Réparation urgente','Sinistre','Contrôle réglementaire','Travaux votés en AG','Diagnostic'],
+    localisations:['Parties communes — RDC','Parties communes — Escalier','Toiture / terrasse','Cave / sous-sol','Façade','Ascenseur','Réseau électrique','Réseau plomberie','Lot privatif','Autre'],
+    statuts_intervention:['urgent','planifié','en cours','terminé'],
+    specialites_prest:['Assurance immeuble','Ascenseur','Ménage','Plomberie','Électricité','Jardinage','Maçonnerie','Désinsectisation','Autre'],
+    statuts_prest:['actif','à renouveler','résilié'],
+    types_cle:['Clé portail','Clé hall','Clé boîte aux lettres','Badge électronique','Clé cave','Clé local vélos','Clé parking','Autre'],
+    statuts_cle:['remis','restitué','perdu'],
+    types_location:['Place de parking','Box / garage','Local vélos','Cave','Local commercial','Autre'],
+    categories_budget:['Personnel / entretien','Assurances','Ascenseur','Eau et énergie','Travaux','Frais administratifs','Fonds travaux','Divers'],
+    natures_sinistre:['Dégât des eaux','Incendie','Vandalisme','Tempête / intempérie','Bris de glace','Effondrement / fissures','Vol / cambriolage','Autre'],
+    statuts_sinistre:['déclaré','expertise en cours','en attente indemnisation','clôturé'],
+    categories_journal:['note','appel téléphonique','courrier envoyé','courrier reçu','visite / constat','décision prise','relance','suivi travaux']
+  }
+};
+
+var calY=new Date().getFullYear(),calM=new Date().getMonth();
+var aplLignes=[];
+var currentApelIdx=-1;
+
+function G(id){return document.getElementById(id);}
+function sv(){try{localStorage.setItem('syndic_v10',JSON.stringify(S));}catch(e){}}
+
+function ld(){
+  try{
+    // Migrer depuis anciennes versions
+    var d=localStorage.getItem('syndic_v10')||localStorage.getItem('syndic_v3');
+    if(d){var p=JSON.parse(d);
+      if(p.listes){Object.keys(S.listes).forEach(function(k){if(p.listes[k])S.listes[k]=p.listes[k];});}
+      var keys=['immeuble','copros','appels','budget','interventions','prestataires','fonds','sinistres','locations','cles','journal','urgences','events','ag','ag_hist','lots_bat','cles_rep'];
+      keys.forEach(function(k){if(p[k]!==undefined)S[k]=p[k];});
+      if(!S.ag)S.ag={dt:'',h:'18:00',lieu:'',type:'Assemblée générale ordinaire',odj:[]};
+      if(!S.ag.odj)S.ag.odj=[];
+      if(!S.lots_bat)S.lots_bat=[];
+      if(!S.cles_rep)S.cles_rep=[];
+    }
+  }catch(e){}
+  applyImm();applyAG();populateAllSelects();renderAll();renderParams();applyLogo();
+}
+
+function getNom(){return S.immeuble.nom||'[Copropriété]';}
+function getAdr(){return S.immeuble.adr||'[Adresse]';}
+function getSyn(){return S.immeuble.syn||'[Syndic bénévole]';}
+function fmtDate(d){return d?new Date(d+'T12:00:00').toLocaleDateString('fr-FR'):'—';}
+function today(){return new Date().toLocaleDateString('fr-FR');}
+
+// ─── SÉLECTEURS DYNAMIQUES ──────────────────────────────────────────
+var SELECT_MAP={
+  'cp-eta':'etages',
+  'cp-occ':'occupations',
+  'bat-type':'types_intervention',
+  'bat-loc':'localisations',
+  'bat-sta':'statuts_intervention',
+  'pr-spe':'specialites_prest',
+  'pr-sta':'statuts_prest',
+  'cle-type':'types_cle',
+  'cle-sta':'statuts_cle',
+  'loc-type':'types_location',
+  'bud-cat':'categories_budget',
+  'sin-nat':'natures_sinistre',
+  'sin-sta':'statuts_sinistre',
+  'jou-cat':'categories_journal',
+  'lot-type':'types_lot',
+  'lot-etage':'etages'
+};
+
+function populateSelect(id,listKey){
+  var el=G(id);if(!el)return;
+  var val=el.value;
+  el.innerHTML=S.listes[listKey].map(function(v){return '<option value="'+v+'">'+v+'</option>';}).join('');
+  if(val)el.value=val;
+}
+
+function populateAllSelects(){
+  Object.keys(SELECT_MAP).forEach(function(id){populateSelect(id,SELECT_MAP[id]);});
+  populateLotSelects();
+  populateCoprosSelects();
+}
+
+function populateLotSelects(){
+  // Select lot pour copropriétaires
+  var sel=G('cp-lot-sel');
+  if(sel){
+    var cur=sel.value;
+    sel.innerHTML='<option value="">-- Choisir un lot --</option>'+
+      S.lots_bat.map(function(l){
+        var cop=S.copros.find(function(c){return copOwnsLot(c,l.num);});
+        var occupied=cop?' ('+cop.pre+' '+cop.nom+')':'';
+        return '<option value="'+l.num+'">Lot '+l.num+' — '+l.type+(l.etage?' — '+l.etage:'')+occupied+'</option>';
+      }).join('');
+    if(cur)sel.value=cur;
+  }
+  // Select lot pour clés
+  var clesel=G('cle-lot-sel');
+  if(clesel){
+    var cur2=clesel.value;
+    clesel.innerHTML='<option value="">-- Lot --</option>'+
+      S.lots_bat.map(function(l){return '<option value="'+l.num+'">Lot '+l.num+'</option>';}).join('');
+    if(cur2)clesel.value=cur2;
+  }
+}
+
+function populateCoprosSelects(){
+  function copLabel(c){
+    var lots=getCopLotNums(c);
+    return 'Lot'+( lots.length>1?'s ':' ')+lots.join('+')+' — '+c.pre+' '+c.nom;
+  }
+  // Select copros pour releve
+  var relSel=G('releve-select');
+  if(relSel){
+    var cur=relSel.value;
+    relSel.innerHTML='<option value="">-- Choisissez un copropriétaire --</option>'+
+      S.copros.map(function(c,i){return '<option value="'+i+'">'+copLabel(c)+'</option>';}).join('');
+    if(cur!=='')relSel.value=cur;
+  }
+  // Select copros pour fiches
+  var fCopSel=G('fiche-cop-sel');
+  if(fCopSel){
+    var cur2=fCopSel.value;
+    fCopSel.innerHTML='<option value="">-- Tous les copropriétaires --</option>'+
+      S.copros.map(function(c,i){return '<option value="'+i+'">'+copLabel(c)+'</option>';}).join('');
+    if(cur2!=='')fCopSel.value=cur2;
+  }
+  // Select copros pour courriers
+  var coDest=G('co-dest-cop');
+  if(coDest){
+    coDest.innerHTML='<option value="">-- Copropriétaire (optionnel) --</option>'+
+      S.copros.map(function(c,i){return '<option value="'+i+'">'+copLabel(c)+'</option>';}).join('');
+  }
+  // Select appels pour fiches
+  var fApSel=G('fiche-appel-sel');
+  if(fApSel){
+    var cur3=fApSel.value;
+    fApSel.innerHTML='<option value="">-- Choisir un appel --</option>'+
+      S.appels.map(function(a,i){return '<option value="'+i+'">'+a.titre+'</option>';}).join('');
+    if(cur3!=='')fApSel.value=cur3;
+  }
+}
+
+// ─── PARAMÈTRES — LISTES PERSONNALISABLES ──────────────────────────
+var PARAM_LABELS={
+  etages:'Étages',
+  occupations:'Types d\'occupation',
+  natures_charges:'Natures de charges',
+  cles_repartition:'Clés de répartition (appels de fonds)',
+  types_lot:'Types de lot',
+  types_intervention:'Types d\'intervention (bâtiment)',
+  localisations:'Localisations (bâtiment)',
+  statuts_intervention:'Statuts d\'intervention',
+  specialites_prest:'Spécialités prestataires',
+  statuts_prest:'Statuts prestataires',
+  types_cle:'Types de clés/badges',
+  statuts_cle:'Statuts clés/badges',
+  types_location:'Types de location',
+  categories_budget:'Catégories budget',
+  natures_sinistre:'Natures de sinistres',
+  statuts_sinistre:'Statuts sinistres',
+  categories_journal:'Catégories journal'
+};
+
+function renderParams(){
+  var grid=G('param-grid');if(!grid)return;
+  var keys=Object.keys(S.listes);
+  var col1=keys.slice(0,Math.ceil(keys.length/2));
+  var col2=keys.slice(Math.ceil(keys.length/2));
+  function renderCol(ks){
+    return '<div>'+ks.map(function(k){
+      return '<div class="card param-section" style="margin-bottom:14px">'+
+        '<h3>'+PARAM_LABELS[k]+'</h3>'+
+        '<div class="list-manager" id="pm-'+k+'">'+
+          S.listes[k].map(function(v,i){
+            var safe=v.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+            return '<div class="list-item" draggable="true" data-key="'+k+'" data-idx="'+i+'" '+
+              'ondragstart="listDragStart(event)" ondragover="listDragOver(event)" '+
+              'ondragleave="listDragLeave(event)" ondrop="listDrop(event,\''+k+'\')" '+
+              'ondragend="listDragEnd(event)">'+
+              '<span class="drag-handle" title="Glisser pour réordonner">⠿</span>'+
+              '<input value="'+safe+'" style="flex:1;padding:4px 8px;font-size:12px;border:.5px solid var(--border2);border-radius:5px;background:var(--bg);color:var(--text);font-family:inherit" '+
+                'onblur="editListItem(\''+k+'\','+i+',this.value)" '+
+                'onkeydown="if(event.key===\'Enter\')this.blur()"/>'+
+              '<button class="del" onclick="removeListItem(\''+k+'\','+i+')" title="Supprimer" style="flex-shrink:0">✕</button>'+
+            '</div>';
+          }).join('')+
+        '</div>'+
+        '<div class="list-add-row" style="margin-top:8px">'+
+          '<input id="pm-in-'+k+'" placeholder="Nouvelle valeur..." onkeydown="if(event.key===\'Enter\')addListItem(\''+k+'\')"/>'+
+          '<button class="btn btn-sm btn-p" onclick="addListItem(\''+k+'\')">+ Ajouter</button>'+
+        '</div>'+
+      '</div>';
+    }).join('')+'</div>';
+  }
+  grid.innerHTML=renderCol(col1)+renderCol(col2);
+}
+
+// ─── DRAG AND DROP LISTES ──────────────────────────────────────────
+var _dragSrcIdx=null;
+function listDragStart(e){
+  _dragSrcIdx=parseInt(e.currentTarget.dataset.idx);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',_dragSrcIdx);
+}
+function listDragOver(e){
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  e.currentTarget.classList.add('drag-over');
+}
+function listDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function listDragEnd(e){
+  document.querySelectorAll('.list-item').forEach(function(el){
+    el.classList.remove('dragging','drag-over');
+  });
+  _dragSrcIdx=null;
+}
+function listDrop(e,k){
+  e.preventDefault();e.stopPropagation();
+  e.currentTarget.classList.remove('drag-over');
+  var toIdx=parseInt(e.currentTarget.dataset.idx);
+  if(_dragSrcIdx===null||_dragSrcIdx===toIdx)return;
+  var arr=S.listes[k];
+  var item=arr.splice(_dragSrcIdx,1)[0];
+  arr.splice(toIdx,0,item);
+  sv();populateAllSelects();renderLignes();renderParams();
+}
+
+function editListItem(k,i,val){
+  val=val.trim();if(!val){renderParams();return;}
+  S.listes[k][i]=val;sv();populateAllSelects();renderLignes();
+}
+function moveListItem(k,i,dir){
+  var arr=S.listes[k];var j=i+dir;
+  if(j<0||j>=arr.length)return;
+  var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;
+  sv();renderParams();populateAllSelects();
+}
+function addListItem(k){
+  var inp=G('pm-in-'+k);var v=inp.value.trim();if(!v)return;
+  S.listes[k].push(v);inp.value='';
+  sv();renderParams();populateAllSelects();renderLignes();
+}
+function removeListItem(k,i){
+  if(S.listes[k].length<=1)return alert('Impossible de supprimer le dernier élément.');
+  S.listes[k].splice(i,1);sv();renderParams();populateAllSelects();renderLignes();
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────────
+function T(id){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  var el=G(id);if(el)el.classList.add('active');
+  var nb=document.querySelector('[data-tab="'+id+'"]');if(nb)nb.classList.add('active');
+  if(id==='agenda')renderCal();
+  if(id==='releve'){populateCoprosSelects();renderReleve();}
+  if(id==='fiches'){populateCoprosSelects();renderFicheSelects();}
+  if(id==='repartition')renderRepartition();
+  updateDash();updateStats();
+}
+
+function renderAll(){
+  renderLots();renderCopros();renderAppels();renderInterventions();renderPrestataires();
+  renderBudget();renderFonds();renderSinistres();renderLocations();renderCles();
+  renderJournal();renderUrgences();renderAGHist();renderRepartition();
+  populateCoprosSelects();populateLotSelects();updateDash();updateStats();
+}
+
+// ─── IMMEUBLE ──────────────────────────────────────────────────────
+function applyImm(){
+  G('imm-nom').value=S.immeuble.nom||'';G('imm-adr').value=S.immeuble.adr||'';
+  G('imm-lots').value=S.immeuble.lots||'';G('imm-an').value=S.immeuble.an||'';
+  G('imm-syn').value=S.immeuble.syn||'';if(G('imm-rib'))G('imm-rib').value=S.immeuble.rib||'';if(G('imm-banque'))G('imm-banque').value=S.immeuble.banque||'';if(G('imm-dom'))G('imm-dom').value=S.immeuble.domiciliation||'';
+  if(S.immeuble.nom)G('header-sub').textContent=S.immeuble.nom+' — Ajaccio';
+}
+function saveImm(){
+  S.immeuble.nom=G('imm-nom').value;S.immeuble.adr=G('imm-adr').value;
+  S.immeuble.lots=G('imm-lots').value;S.immeuble.an=G('imm-an').value;
+  S.immeuble.syn=G('imm-syn').value;S.immeuble.rib=G('imm-rib')?G('imm-rib').value:'';S.immeuble.banque=G('imm-banque')?G('imm-banque').value:'';S.immeuble.domiciliation=G('imm-dom')?G('imm-dom').value:'';
+  if(S.immeuble.nom)G('header-sub').textContent=S.immeuble.nom+' — Ajaccio';sv();
+}
+
+// ─── DASHBOARD ─────────────────────────────────────────────────────
+function updateDash(){
+  G('nb-cop').textContent=S.copros.length;
+  var imp=0;
+  S.appels.forEach(function(a){a.copros.forEach(function(c){var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);imp+=(du-pay);});});
+  G('nb-imp').textContent=Math.max(0,Math.round(imp))+' €';
+  G('nb-appels').textContent=S.appels.filter(function(a){return a.statut!=='clôturé';}).length;
+  G('nb-sin').textContent=S.sinistres.filter(function(s){return s.sta!=='clôturé';}).length;
+
+  var now=new Date(),html='';
+  S.prestataires.forEach(function(p){if(p.fin&&p.sta==='actif'){var diff=Math.round((new Date(p.fin)-now)/864e5);if(diff<60&&diff>0)html+='<div class="al al-w">Contrat <strong>'+p.nom+'</strong> expire dans '+diff+' j.</div>';if(diff<=0)html+='<div class="al al-e">Contrat <strong>'+p.nom+'</strong> expiré !</div>';}});
+  S.sinistres.forEach(function(s){if(s.sta!=='clôturé')html+='<div class="al al-e">Sinistre ouvert : <strong>'+s.nat+'</strong>.</div>';});
+  S.interventions.forEach(function(i){if(i.sta==='urgent')html+='<div class="al al-e">Urgent : <strong>'+i.type+'</strong> — '+i.loc+'</div>';});
+  S.appels.forEach(function(a){if(a.echeance&&new Date(a.echeance)>now){var diff=Math.round((new Date(a.echeance)-now)/864e5);if(diff<14)html+='<div class="al al-w">Appel <strong>'+a.titre+'</strong> — échéance dans '+diff+' j.</div>';}});
+  G('dash-alertes').innerHTML=html||'<div class="es">Aucune alerte.</div>';
+
+  var totDu=0,totPay=0;
+  S.appels.forEach(function(a){a.copros.forEach(function(c){var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);totDu+=du;totPay+=pay;});});
+  if(totDu>0){var pct=Math.round(totPay/totDu*100);G('dash-taux').textContent=pct+'% recouvré — '+Math.round(totPay)+' € / '+Math.round(totDu)+' €';G('dash-pf').style.width=pct+'%';}
+  else{G('dash-taux').textContent='Aucun appel de fonds.';G('dash-pf').style.width='0%';}
+
+  var ech='';
+  S.appels.forEach(function(a){if(a.echeance&&new Date(a.echeance)>now){var diff=Math.round((new Date(a.echeance)-now)/864e5);if(diff<30)ech+='<div class="al al-i">Appel <strong>'+a.titre+'</strong> — '+fmtDate(a.echeance)+' (dans '+diff+' j.)</div>';}});
+  if(S.ag.dt&&new Date(S.ag.dt)>now){var d2=Math.round((new Date(S.ag.dt)-now)/864e5);if(d2<60)ech+='<div class="al al-ok">AG prévue dans '+d2+' jours ('+fmtDate(S.ag.dt)+').</div>';}
+  G('dash-ech').innerHTML=ech||'<div class="es">Aucune échéance proche.</div>';
+}
+
+// ─── CALENDRIER ────────────────────────────────────────────────────
+function renderCal(){
+  var months=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  var days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  G('cal-title').textContent=months[calM]+' '+calY;
+  G('cal-names').innerHTML=days.map(function(d){return '<div class="cal-dn">'+d+'</div>';}).join('');
+  var first=new Date(calY,calM,1),dow=(first.getDay()+6)%7,dim=new Date(calY,calM+1,0).getDate(),prev=new Date(calY,calM,0).getDate(),todayD=new Date();
+  var evts=getCalEvts();var cells='';
+  for(var i=0;i<dow;i++)cells+='<div class="cal-day om"><div class="cal-dn-num">'+(prev-dow+1+i)+'</div></div>';
+  for(var d=1;d<=dim;d++){
+    var isT=d===todayD.getDate()&&calM===todayD.getMonth()&&calY===todayD.getFullYear();
+    var ds=calY+'-'+(calM<9?'0':'')+(calM+1)+'-'+(d<10?'0':'')+d;
+    var de=(evts[ds]||[]).slice(0,3).map(function(e){return '<div class="cal-evt badge b-'+e.c+'" title="'+e.l+'">'+e.l+'</div>';}).join('');
+    cells+='<div class="cal-day'+(isT?' today':'')+'"><div class="cal-dn-num">'+d+'</div>'+de+'</div>';
+  }
+  var rem=(7-(dow+dim)%7)%7;for(var j=1;j<=rem;j++)cells+='<div class="cal-day om"><div class="cal-dn-num">'+j+'</div></div>';
+  G('cal-grid').innerHTML=cells;
+}
+function getCalEvts(){
+  var ev={};
+  function add(dt,l,c){if(!dt)return;var d=dt.slice(0,10);if(!ev[d])ev[d]=[];ev[d].push({l:l,c:c});}
+  S.appels.forEach(function(a){if(a.echeance)add(a.echeance,'Appel: '+a.titre.slice(0,12),'info');});
+  S.prestataires.forEach(function(p){if(p.fin)add(p.fin,'Fin: '+p.nom.slice(0,10),'warn');});
+  if(S.ag.dt)add(S.ag.dt,'AG','ok');
+  S.sinistres.forEach(function(s){if(s.dt&&s.sta!=='clôturé')add(s.dt,'Sinistre','err');});
+  S.events.forEach(function(e){add(e.dt,e.lbl,e.type);});
+  S.journal.forEach(function(j){var d=(j.dt||'').slice(0,10);if(d)add(d,j.cat.slice(0,8),'pur');});
+  return ev;
+}
+function calNav(dir){calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCal();}
+function calToday(){calY=new Date().getFullYear();calM=new Date().getMonth();renderCal();}
+function addEvent(){var dt=G('ev-dt').value,lbl=G('ev-lbl').value.trim(),type=G('ev-type').value;if(!dt||!lbl)return;S.events.push({dt:dt,lbl:lbl,type:type});sv();renderCal();G('ev-lbl').value='';}
+
+// ─── JOURNAL ───────────────────────────────────────────────────────
+function addJournal(){var txt=G('jou-txt').value.trim();if(!txt)return;S.journal.unshift({dt:G('jou-dt').value||new Date().toISOString().slice(0,16),cat:G('jou-cat').value,inter:G('jou-inter').value.trim(),txt:txt});sv();renderJournal();G('jou-txt').value='';G('jou-inter').value='';}
+function renderJournal(){
+  var q=G('jou-search').value.toLowerCase();
+  var items=S.journal.filter(function(j){return !q||j.txt.toLowerCase().includes(q)||j.cat.toLowerCase().includes(q)||(j.inter||'').toLowerCase().includes(q);});
+  if(!items.length){G('jou-list').innerHTML='<div class="es">Aucune entrée.</div>';return;}
+  G('jou-list').innerHTML=items.map(function(j,i){return '<div class="jou-entry"><div style="font-size:10px;color:var(--text3);margin-bottom:3px"><span class="badge b-n">'+j.cat+'</span> '+j.dt.replace('T',' ')+(j.inter?' — <em>'+j.inter+'</em>':'')+'</div><div style="font-size:13px">'+j.txt+'</div></div>';}).join('');
+}
+
+// ─── LOTS DU BÂTIMENT ──────────────────────────────────────────────
+function autoFillFromLot(){
+  // Conservé pour rétrocompatibilité — non utilisé dans le nouveau formulaire
+}
+function saveLot(){
+  var num=G('lot-num').value.trim();
+  if(!num)return alert('Le numéro de lot est obligatoire.');
+  var lot={num:num,ref:G('lot-ref').value.trim(),type:G('lot-type').value,etage:G('lot-etage').value,surf:parseFloat(G('lot-surf').value)||0,tan:parseInt(G('lot-tan').value)||0,desc:G('lot-desc').value.trim()};
+  var idx=parseInt(G('lot-idx').value);
+  if(idx>=0)S.lots_bat[idx]=lot;else{
+    var exist=S.lots_bat.findIndex(function(l){return String(l.num)===String(num);});
+    if(exist>=0&&!confirm('Un lot n°'+num+' existe déjà. Remplacer ?'))return;
+    if(exist>=0)S.lots_bat[exist]=lot;else S.lots_bat.push(lot);
+  }
+  sv();resetLot();renderLots();populateLotSelects();
+}
+function resetLot(){['lot-num','lot-ref','lot-surf','lot-tan','lot-desc'].forEach(function(id){G(id).value='';});G('lot-idx').value='-1';G('lot-form-title').textContent='Créer un lot';}
+function editLot(i){var l=S.lots_bat[i];G('lot-num').value=l.num;G('lot-ref').value=l.ref||'';G('lot-type').value=l.type||S.listes.types_lot[0];G('lot-etage').value=l.etage||S.listes.etages[0];G('lot-surf').value=l.surf||'';G('lot-tan').value=l.tan||'';G('lot-desc').value=l.desc||'';G('lot-idx').value=i;G('lot-form-title').textContent='Modifier — Lot '+l.num;}
+function delLot(i){if(!confirm('Supprimer ce lot ?'))return;S.lots_bat.splice(i,1);sv();renderLots();populateLotSelects();}
+function renderLots(){
+  var q=(G('lot-search')||{value:''}).value.toLowerCase();
+  var items=S.lots_bat.filter(function(l){return !q||String(l.num).includes(q)||l.type.toLowerCase().includes(q)||(l.ref||'').toLowerCase().includes(q);});
+  G('lot-count').textContent=S.lots_bat.length;
+  var totTan=S.lots_bat.reduce(function(s,l){return s+(l.tan||0);},0);
+  var ok=Math.abs(totTan-10000)<1;
+  G('lot-totaux').innerHTML='<div class="stat-row"><span>Lots enregistrés</span><strong>'+S.lots_bat.length+'</strong></div><div class="stat-row"><span>Total tantièmes généraux</span><strong style="color:'+(ok?'#63a020':'#e24b4a')+'">'+totTan+' / 10000</strong></div><div class="stat-row"><span>Surface totale</span><strong>'+S.lots_bat.reduce(function(s,l){return s+(l.surf||0);},0).toFixed(1)+' m²</strong></div>';
+  var alertTan=G('lot-alerte-tan');
+  if(totTan>0&&!ok){alertTan.style.display='block';alertTan.textContent='Attention : la somme des tantièmes est '+totTan+' (doit être 10000).';}
+  else alertTan.style.display='none';
+
+  if(!items.length){G('lot-table').innerHTML='<div class="es">Aucun lot enregistré.</div>';return;}
+  G('lot-table').innerHTML='<table><thead><tr><th>N°</th><th>Réf.</th><th>Type</th><th>Étage</th><th>Surface</th><th>Tantièmes</th><th>Copropriétaire</th><th>Description</th><th></th></tr></thead><tbody>'+items.map(function(l,i){
+    var cop=S.copros.find(function(c){return copOwnsLot(c,l.num);});
+    var ri=S.lots_bat.indexOf(l);
+    return '<tr><td><span class="lchip">'+l.num+'</span></td><td>'+( l.ref||'—')+'</td><td>'+l.type+'</td><td>'+l.etage+'</td><td>'+(l.surf?l.surf+' m²':'—')+'</td><td>'+l.tan+'</td><td>'+(cop?'<span class="lot-link">'+cop.pre+' '+cop.nom+'</span>':'<span style="color:var(--text3);font-size:11px">Non affecté</span>')+'</td><td style="font-size:11px;color:var(--text2)">'+( l.desc||'—')+'</td><td><button class="btn btn-sm" onclick="editLot('+ri+')">✎</button> <button class="del" onclick="delLot('+ri+')">✕</button></td></tr>';
+  }).join('')+'</tbody></table>';
+}
+
+// ─── COPROPRIÉTAIRES ───────────────────────────────────────────────
+// Chaque copropriétaire a maintenant :
+//   c.lots = [{num, tan, eta}]  (tableau de lots)
+//   c.lot  = lots[0].num       (rétrocompatibilité lecture seule)
+//   c.tan  = somme tantièmes   (calculé)
+
+function getCopLots(c){
+  // Rétrocompat : ancien format c.lot (string) → convertit à la volée
+  if(c.lots&&c.lots.length)return c.lots;
+  if(c.lot)return [{num:c.lot,tan:c.tan||0,eta:c.eta||''}];
+  return [];
+}
+function getCopTan(c){return getCopLots(c).reduce(function(s,l){return s+(l.tan||0);},0);}
+function getCopLotNums(c){return getCopLots(c).map(function(l){return l.num;});}
+function copOwnsLot(c,lotNum){return getCopLotNums(c).map(String).indexOf(String(lotNum))>=0;}
+
+// Lignes de lots dans le formulaire
+var _copLotRows=[];
+function addCopLotRow(num,tan,eta){
+  _copLotRows.push({num:num||'',tan:tan||0,eta:eta||''});
+  renderCopLotRows();
+}
+function removeCopLotRow(i){
+  _copLotRows.splice(i,1);
+  renderCopLotRows();
+}
+function renderCopLotRows(){
+  var container=G('cp-lots-rows');if(!container)return;
+  if(!_copLotRows.length){
+    container.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0">Aucun lot — cliquez sur "+ Ajouter un lot".</div>';
+    return;
+  }
+  var lotsOpts=S.lots_bat.map(function(l){return '<option value="'+l.num+'">Lot '+l.num+(l.type?' — '+l.type:'')+'</option>';}).join('');
+  container.innerHTML=_copLotRows.map(function(row,i){
+    var lotSel=S.lots_bat.length
+      ?'<select onchange="copLotRowChange('+i+',\'num\',this.value);autoFillCopLot('+i+')">'+(lotsOpts||'<option value="">—</option>')+'</select>'
+      :'<input type="number" placeholder="N° lot" value="'+(row.num||'')+'" oninput="copLotRowChange('+i+',\'num\',this.value)"/>';
+    // Si lots_bat disponibles, synchro la valeur sélectionnée
+    return '<div class="cop-lot-row">'+
+      '<div>'+
+        (S.lots_bat.length
+          ?'<select id="cplr-num-'+i+'" onchange="copLotRowChange('+i+',\'num\',this.value);autoFillCopLot('+i+')"><option value="">— Choisir —</option>'+
+            S.lots_bat.map(function(l){return '<option value="'+l.num+'"'+(String(l.num)===String(row.num)?' selected':'')+'>Lot '+l.num+(l.type?' — '+l.type:'')+'</option>';}).join('')+
+          '</select>'
+          :'<input type="number" id="cplr-num-'+i+'" placeholder="N° lot" value="'+(row.num||'')+'" oninput="copLotRowChange('+i+',\'num\',this.value)"/>')+
+      '</div>'+
+      '<div><input id="cplr-tan-'+i+'" type="number" placeholder="Tant." value="'+(row.tan||'')+'" oninput="copLotRowChange('+i+',\'tan\',parseInt(this.value)||0)" title="Tantièmes pour ce lot"/></div>'+
+      '<div><select id="cplr-eta-'+i+'" onchange="copLotRowChange('+i+',\'eta\',this.value)">'+
+        S.listes.etages.map(function(e){return '<option'+(e===row.eta?' selected':'')+'>'+e+'</option>';}).join('')+
+      '</select></div>'+
+      '<button class="del" onclick="removeCopLotRow('+i+')" title="Retirer ce lot">✕</button>'+
+    '</div>';
+  }).join('');
+}
+function copLotRowChange(i,field,val){if(_copLotRows[i])_copLotRows[i][field]=val;}
+function autoFillCopLot(i){
+  var sel=G('cplr-num-'+i);if(!sel)return;
+  var num=sel.value;
+  var lot=S.lots_bat.find(function(l){return String(l.num)===String(num);});
+  if(!lot)return;
+  if(lot.tan&&G('cplr-tan-'+i))G('cplr-tan-'+i).value=lot.tan;
+  if(lot.etage&&G('cplr-eta-'+i))G('cplr-eta-'+i).value=lot.etage;
+  copLotRowChange(i,'tan',lot.tan||0);
+  copLotRowChange(i,'eta',lot.etage||'');
+}
+
+function saveCop(){
+  var nom=G('cp-nom').value.trim();
+  if(!nom)return alert('Le nom est obligatoire.');
+  if(!_copLotRows.length||!_copLotRows[0].num)return alert('Ajoutez au moins un lot.');
+  var c={
+    nom:nom,
+    pre:G('cp-pre').value.trim(),
+    lots:_copLotRows.map(function(r){return {num:r.num,tan:parseInt(r.tan)||0,eta:r.eta||''};}).filter(function(r){return r.num;}),
+    tel:G('cp-tel').value.trim(),
+    email:G('cp-email').value.trim(),
+    occ:G('cp-occ').value,
+    notes:G('cp-notes').value.trim()
+  };
+  // Rétrocompat : lot/tan/eta pointent sur le premier lot
+  c.lot=c.lots[0].num;
+  c.tan=getCopTan(c);
+  c.eta=c.lots[0].eta||'';
+  var idx=parseInt(G('cp-idx').value);
+  if(idx>=0)S.copros[idx]=c;else S.copros.push(c);
+  sv();resetCop();renderCopros();populateLotSelects();populateCoprosSelects();
+}
+
+function resetCop(){
+  ['cp-nom','cp-pre','cp-tel','cp-email','cp-notes'].forEach(function(id){G(id).value='';});
+  G('cp-idx').value='-1';
+  G('form-cop-t').textContent='Ajouter un copropriétaire';
+  _copLotRows=[];
+  renderCopLotRows();
+}
+
+function editCop(i){
+  var c=S.copros[i];
+  G('cp-nom').value=c.nom;
+  G('cp-pre').value=c.pre||'';
+  G('cp-tel').value=c.tel||'';
+  G('cp-email').value=c.email||'';
+  G('cp-occ').value=c.occ||S.listes.occupations[0];
+  G('cp-notes').value=c.notes||'';
+  G('cp-idx').value=i;
+  G('form-cop-t').textContent='Modifier — '+c.pre+' '+c.nom;
+  _copLotRows=getCopLots(c).map(function(l){return {num:l.num,tan:l.tan||0,eta:l.eta||''};});
+  renderCopLotRows();
+  G('copros').scrollIntoView({behavior:'smooth'});
+}
+
+function delCop(i){if(!confirm('Supprimer ce copropriétaire ?'))return;S.copros.splice(i,1);sv();renderCopros();populateLotSelects();populateCoprosSelects();}
+
+function renderCopros(){
+  G('cop-count').textContent=S.copros.length;
+  G('cop-tan-total').textContent=S.copros.reduce(function(s,c){return s+getCopTan(c);},0);
+  if(!S.copros.length){G('cop-table').innerHTML='<div class="es">Aucun copropriétaire.</div>';return;}
+  G('cop-table').innerHTML='<table><thead><tr><th>Lots</th><th>Nom</th><th>Tantièmes</th><th>Occupation</th><th>Contact</th><th></th></tr></thead><tbody>'+
+    S.copros.map(function(c,i){
+      var lots=getCopLots(c);
+      var lotsChips=lots.map(function(l){return '<span class="lchip">'+l.num+'</span>';}).join(' ');
+      var tanTotal=getCopTan(c);
+      return '<tr>'+
+        '<td>'+lotsChips+'</td>'+
+        '<td><strong>'+c.pre+' '+c.nom+'</strong>'+
+          (lots.length>1?'<br><span style="font-size:10px;color:var(--text3)">'+lots.length+' lots · '+lots.map(function(l){return 'Lot '+l.num+' : '+l.tan+' tant.';}).join(', ')+'</span>':
+          (lots[0]&&lots[0].eta?'<br><span style="font-size:10px;color:var(--text3)">'+lots[0].eta+'</span>':''))+
+        '</td>'+
+        '<td>'+tanTotal+'/10000</td>'+
+        '<td><span class="badge b-n">'+(c.occ||'—')+'</span></td>'+
+        '<td style="font-size:11px;color:var(--text2)">'+(c.tel||'')+(c.email?'<br>'+c.email:'')+'</td>'+
+        '<td><button class="btn btn-sm" onclick="editCop('+i+')">✎</button> <button class="del" onclick="delCop('+i+')">✕</button></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+// ─── CLÉS DE RÉPARTITION ───────────────────────────────────────────
+function saveCleRep(){
+  var nom=G('crep-nom').value.trim();
+  if(!nom)return alert('Nom de la clé obligatoire.');
+  var cr={nom:nom,total:parseInt(G('crep-total').value)||10000,desc:G('crep-desc').value.trim(),lots:{}};
+  // Récupérer les valeurs du tableau si existant
+  S.lots_bat.forEach(function(l){var inp=G('crep-inp-'+l.num);if(inp)cr.lots[l.num]=parseInt(inp.value)||0;});
+  var idx=parseInt(G('crep-idx').value);
+  if(idx>=0)S.cles_rep[idx]=cr;else S.cles_rep.push(cr);
+  // Sync liste des clés de répartition
+  if(!S.listes.cles_repartition.includes(nom))S.listes.cles_repartition.push(nom);
+  sv();resetCleRep();renderRepartition();populateAllSelects();renderLignes();
+}
+function resetCleRep(){G('crep-nom').value='';G('crep-total').value='10000';G('crep-desc').value='';G('crep-idx').value='-1';G('cle-rep-form-title').textContent='Créer une clé de répartition';}
+function editCleRep(i){var cr=S.cles_rep[i];G('crep-nom').value=cr.nom;G('crep-total').value=cr.total||10000;G('crep-desc').value=cr.desc||'';G('crep-idx').value=i;G('cle-rep-form-title').textContent='Modifier — '+cr.nom;renderRepartition();}
+function delCleRep(i){if(!confirm('Supprimer cette clé de répartition ?'))return;S.cles_rep.splice(i,1);sv();renderRepartition();}
+
+function renderRepartition(){
+  // Synthèse des clés
+  var synth=G('crep-synth');
+  if(synth){
+    if(!S.cles_rep.length){synth.innerHTML='<div class="es">Aucune clé définie.</div>';}
+    else{synth.innerHTML=S.cles_rep.map(function(cr){var tot=Object.values(cr.lots||{}).reduce(function(s,v){return s+(v||0);},0);var ok=Math.abs(tot-(cr.total||10000))<1;return '<div class="stat-row"><span>'+cr.nom+'</span><strong style="color:'+(ok?'#63a020':'#e24b4a')+'">'+tot+' / '+(cr.total||10000)+'</strong></div>';}).join('');}
+  }
+
+  // Tableau de répartition multi-clés
+  var tableDiv=G('crep-table');
+  if(tableDiv){
+    if(!S.lots_bat.length&&!S.cles_rep.length){tableDiv.innerHTML='<div class="es">Ajoutez des lots et des clés de répartition.</div>';}
+    else if(!S.lots_bat.length){tableDiv.innerHTML='<div class="al al-w">Enregistrez d\'abord des lots dans "Lots du bâtiment".</div>';}
+    else{
+      // En-têtes dynamiques
+      var thead='<thead><tr><th>Lot</th><th>Type</th><th>Copropriétaire</th>';
+      S.cles_rep.forEach(function(cr){thead+='<th>'+cr.nom+'<br><span style="font-weight:400;font-size:9px;opacity:.7">/ '+cr.total+'</span></th>';});
+      thead+='</tr></thead>';
+      // Lignes
+      var tbody='<tbody>'+S.lots_bat.map(function(l){
+        var cop=S.copros.find(function(c){return copOwnsLot(c,l.num);});
+        var row='<tr><td><span class="lchip">'+l.num+'</span></td><td>'+l.type+'</td><td>'+(cop?cop.pre+' '+cop.nom:'<em style="color:var(--text3)">Non affecté</em>')+'</td>';
+        S.cles_rep.forEach(function(cr,ci){
+          var v=(cr.lots||{})[l.num]||0;
+          var editing=parseInt(G('crep-idx').value)===ci;
+          row+='<td><input type="number" id="crep-inp-'+l.num+'" value="'+v+'" min="0" style="width:80px;padding:3px 6px;font-size:12px;text-align:right" onchange="updateCleRepLot('+ci+',\''+l.num+'\',parseInt(this.value)||0)"/></td>';
+        });
+        row+='</tr>';return row;
+      }).join('');
+      // Totaux
+      var tfoot='<tfoot style="font-weight:500"><tr><td colspan="3">Total</td>';
+      S.cles_rep.forEach(function(cr){var tot=Object.values(cr.lots||{}).reduce(function(s,v){return s+(v||0);},0);var ok=Math.abs(tot-(cr.total||10000))<1;tfoot+='<td style="color:'+(ok?'#63a020':'#e24b4a')+'">'+tot+'</td>';});
+      tfoot+='</tr></tfoot>';
+      tableDiv.innerHTML='<table>'+thead+tbody+tfoot+'</table>';
+    }
+  }
+
+  // Liste des clés
+  var listContainer=G('crep-list-container');
+  if(listContainer){
+    if(!S.cles_rep.length){listContainer.innerHTML='';return;}
+    listContainer.innerHTML=S.cles_rep.map(function(cr,i){
+      var tot=Object.values(cr.lots||{}).reduce(function(s,v){return s+(v||0);},0);
+      var ok=Math.abs(tot-(cr.total||10000))<1;
+      return '<div class="cle-rep-card">'+
+        '<div class="cle-rep-header">'+
+          '<strong>'+cr.nom+'</strong>'+
+          '<span class="badge '+(ok?'b-ok':'b-warn')+'">'+tot+' / '+(cr.total||10000)+'</span>'+
+          '<button class="btn btn-sm" onclick="editCleRep('+i+')">✎ Modifier</button>'+
+          '<button class="del" onclick="delCleRep('+i+')">✕</button>'+
+        '</div>'+
+        (cr.desc?'<div style="font-size:11px;color:var(--text2);margin-bottom:6px">'+cr.desc+'</div>':'')+
+      '</div>';
+    }).join('');
+  }
+}
+
+function updateCleRepLot(ci,lotNum,val){
+  if(!S.cles_rep[ci])return;
+  if(!S.cles_rep[ci].lots)S.cles_rep[ci].lots={};
+  S.cles_rep[ci].lots[lotNum]=val;
+  sv();
+  // Mise à jour totaux en direct
+  var tot=Object.values(S.cles_rep[ci].lots).reduce(function(s,v){return s+(v||0);},0);
+  var synth=G('crep-synth');if(synth)renderRepartition();
+}
+
+function exportRepartitionDocx(){
+  if(!S.cles_rep.length)return alert('Aucune clé de répartition définie.');
+  var html='<h2 style="color:#1a56a0">TABLEAU DES CLÉS DE RÉPARTITION</h2>';
+  html+='<p style="color:#555;margin-bottom:16px">'+getNom()+' — '+getAdr()+'</p>';
+  html+='<table><thead><tr><th>Lot</th><th>Type</th><th>Copropriétaire</th>';
+  S.cles_rep.forEach(function(cr){html+='<th>'+cr.nom+' / '+cr.total+'</th>';});
+  html+='</tr></thead><tbody>';
+  S.lots_bat.forEach(function(l){
+    var cop=S.copros.find(function(c){return copOwnsLot(c,l.num);});
+    html+='<tr><td><strong>'+l.num+'</strong></td><td>'+l.type+'</td><td>'+(cop?cop.pre+' '+cop.nom:'—')+'</td>';
+    S.cles_rep.forEach(function(cr){html+='<td style="text-align:right">'+((cr.lots||{})[l.num]||0)+'</td>';});
+    html+='</tr>';
+  });
+  html+='<tr style="font-weight:bold;background:#e8edf5"><td colspan="3">Totaux</td>';
+  S.cles_rep.forEach(function(cr){var tot=Object.values(cr.lots||{}).reduce(function(s,v){return s+(v||0);},0);html+='<td style="text-align:right">'+tot+' / '+cr.total+'</td>';});
+  html+='</tr></tbody></table>';
+  html+='<p style="margin-top:16px;color:#888;font-size:9pt">Édité le '+today()+' — '+getSyn()+'</p>';
+  exportToWord(html,'Cles_Repartition_'+getNom().replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10));
+}
+
+function exportRepartitionPdf(){
+  if(!S.cles_rep.length)return alert('Aucune clé de répartition définie.');
+  var html='<h2 style="color:#1a56a0">TABLEAU DES CLÉS DE RÉPARTITION</h2>';
+  html+='<p style="color:#555;margin-bottom:16px">'+getNom()+' — '+getAdr()+'</p>';
+  html+='<table><thead><tr><th>Lot</th><th>Type</th><th>Copropriétaire</th>';
+  S.cles_rep.forEach(function(cr){html+='<th>'+cr.nom+' / '+cr.total+'</th>';});
+  html+='</tr></thead><tbody>';
+  S.lots_bat.forEach(function(l){
+    var cop=S.copros.find(function(c){return copOwnsLot(c,l.num);});
+    html+='<tr><td><strong>'+l.num+'</strong></td><td>'+l.type+'</td><td>'+(cop?cop.pre+' '+cop.nom:'—')+'</td>';
+    S.cles_rep.forEach(function(cr){html+='<td style="text-align:right">'+((cr.lots||{})[l.num]||0)+'</td>';});
+    html+='</tr>';
+  });
+  html+='<tr style="font-weight:bold;background:#e8edf5"><td colspan="3">Totaux</td>';
+  S.cles_rep.forEach(function(cr){var tot=Object.values(cr.lots||{}).reduce(function(s,v){return s+(v||0);},0);html+='<td style="text-align:right">'+tot+' / '+cr.total+'</td>';});
+  html+='</tr></tbody></table>';
+  html+='<p style="margin-top:16px;color:#888;font-size:9pt">Édité le '+today()+' — '+getSyn()+'</p>';
+  exportToPDF(html,'Cles_Repartition_'+getNom());
+}
+
+function exportRepartitionCSV(){
+  if(!S.lots_bat.length)return alert('Aucun lot enregistré.');
+  var headers=['Lot','Type','Copropriétaire'].concat(S.cles_rep.map(function(cr){return cr.nom+'(/'+cr.total+')';}));
+  var rows=S.lots_bat.map(function(l){
+    var cop=S.copros.find(function(c){return copOwnsLot(c,l.num);});
+    return [l.num,l.type,cop?cop.pre+' '+cop.nom:''].concat(S.cles_rep.map(function(cr){return (cr.lots||{})[l.num]||0;}));
+  });
+  var csv=[headers].concat(rows).map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(';');}).join('\n');
+  var b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Repartition_'+getNom().replace(/\s+/g,'_')+'.csv';a.click();
+}
+
+// ─── APPELS DE FONDS ───────────────────────────────────────────────
+function addLigne(){
+  aplLignes.push({nat:S.listes.natures_charges[0],montant:0,cle:S.listes.cles_repartition[0],periode:''});
+  renderLignes();
+}
+function removeLigne(i){aplLignes.splice(i,1);renderLignes();}
+function renderLignes(){
+  var container=G('apl-lignes');if(!container)return;
+  if(!aplLignes.length){container.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">Aucune ligne — cliquez sur "+ Ajouter une ligne".</div>';updateAplTotal();return;}
+  container.innerHTML=aplLignes.map(function(l,i){
+    var natOpts=S.listes.natures_charges.map(function(v){return '<option value="'+v+'"'+(v===l.nat?' selected':'')+'>'+v+'</option>';}).join('');
+    var cleOpts=S.listes.cles_repartition.map(function(v){return '<option value="'+v+'"'+(v===l.cle?' selected':'')+'>'+v+'</option>';}).join('');
+    return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 100px 32px;gap:8px;align-items:center;margin-bottom:6px">'+
+      '<select onchange="aplLignes['+i+'].nat=this.value">'+natOpts+'</select>'+
+      '<input type="number" placeholder="0" value="'+(l.montant||'')+'" min="0" step="0.01" oninput="aplLignes['+i+'].montant=parseFloat(this.value)||0;updateAplTotal()"/>'+
+      '<select onchange="aplLignes['+i+'].cle=this.value">'+cleOpts+'</select>'+
+      '<input placeholder="T1 2025" value="'+(l.periode||'')+'" oninput="aplLignes['+i+'].periode=this.value"/>'+
+      '<button class="del" onclick="removeLigne('+i+')" title="Supprimer">✕</button>'+
+    '</div>';
+  }).join('');
+  updateAplTotal();
+}
+function updateAplTotal(){
+  var tot=aplLignes.reduce(function(s,l){return s+(l.montant||0);},0);
+  var el=G('apl-total');
+  if(el)el.textContent=tot>0?'Total : '+tot.toFixed(2)+' €':'';
+}
+
+// Calcul de montant selon la clé de répartition choisie — multi-lots
+function getMontantCopro(cop,ligne,totCopros){
+  var lots=getCopLots(cop);
+  var cr=S.cles_rep.find(function(c){return c.nom===ligne.cle||ligne.cle.startsWith(c.nom);});
+  if(cr&&cr.lots){
+    // Somme sur tous les lots du copropriétaire
+    var lotTan=lots.reduce(function(s,l){return s+(cr.lots[l.num]||0);},0);
+    var total=cr.total||10000;
+    return Math.round(ligne.montant*lotTan/total*100)/100;
+  }
+  // Fallback sur tantièmes généraux (somme multi-lots)
+  var totT=totCopros||S.copros.reduce(function(s,c){return s+getCopTan(c);},0)||10000;
+  return Math.round(ligne.montant*getCopTan(cop)/totT*100)/100;
+}
+
+function previewAppel(){
+  if(!aplLignes.length)return alert('Ajoutez au moins une ligne de charge.');
+  if(!S.copros.length)return alert('Aucun copropriétaire enregistré.');
+  var totT=S.copros.reduce(function(s,c){return s+getCopTan(c);},0)||10000;
+  var preview=G('apl-preview');preview.style.display='block';
+  var rows=S.copros.map(function(c){
+    var lots=getCopLots(c);
+    var lotsStr=lots.map(function(l){return l.num;}).join(', ');
+    var cols=aplLignes.map(function(l){var mnt=getMontantCopro(c,l,totT);return '<td style="text-align:right">'+mnt.toFixed(2)+' €</td>';}).join('');
+    var total=aplLignes.reduce(function(s,l){return s+getMontantCopro(c,l,totT);},0);
+    return '<tr><td><span class="lchip">'+lotsStr+'</span></td><td>'+c.pre+' '+c.nom+'</td><td>'+getCopTan(c)+'</td>'+cols+'<td style="text-align:right;font-weight:500">'+total.toFixed(2)+' €</td></tr>';
+  }).join('');
+  var ths=aplLignes.map(function(l){return '<th>'+l.nat+(l.periode?' ('+l.periode+')':'')+'</th>';}).join('');
+  var totals='<tr style="font-weight:500"><td colspan="3">Total</td>'+aplLignes.map(function(l){return '<td style="text-align:right">'+l.montant.toFixed(2)+' €</td>';}).join('')+'<td style="text-align:right">'+aplLignes.reduce(function(s,l){return s+l.montant;},0).toFixed(2)+' €</td></tr>';
+  G('apl-preview-table').innerHTML='<div style="overflow-x:auto"><table><thead><tr><th>Lots</th><th>Copropriétaire</th><th>Tant.</th>'+ths+'<th>Total</th></tr></thead><tbody>'+rows+totals+'</tbody></table></div>';
+}
+
+function createAppel(){
+  var titre=G('apl-titre').value.trim();
+  if(!titre)return alert('Donnez un titre à cet appel.');
+  if(!aplLignes.length)return alert('Ajoutez au moins une ligne.');
+  if(!S.copros.length)return alert('Aucun copropriétaire — impossible de répartir.');
+  var totT=S.copros.reduce(function(s,c){return s+getCopTan(c);},0)||10000;
+  var coprosData=S.copros.map(function(c){
+    var lots=getCopLots(c);
+    var lotsStr=lots.map(function(l){return l.num;}).join(', ');
+    var lignes=aplLignes.map(function(l){return {nat:l.nat,cle:l.cle,periode:l.periode,montant:getMontantCopro(c,l,totT),paye:0};});
+    return {lot:lotsStr,nom:c.pre+' '+c.nom,tan:getCopTan(c),lignes:lignes};
+  });
+  var appel={titre:titre,emission:G('apl-emission').value,echeance:G('apl-echeance').value,notes:G('apl-notes').value,lignes:aplLignes.slice(),copros:coprosData,statut:'actif',cree:new Date().toISOString()};
+  var editIdx=parseInt(G('apl-edit-idx').value);
+  if(editIdx>=0)S.appels[editIdx]=appel;else S.appels.push(appel);
+  sv();resetApelForm();renderAppels();populateCoprosSelects();updateDash();
+  alert('Appel "'+titre+'" créé avec succès.');
+}
+
+function resetApelForm(){G('apl-titre').value='';G('apl-emission').value='';G('apl-echeance').value='';G('apl-notes').value='';G('apl-edit-idx').value='-1';G('appel-form-title').textContent='Nouvel appel de fonds';G('apl-preview').style.display='none';aplLignes=[];renderLignes();}
+
+function renderAppels(){
+  var el=G('appels-list');
+  if(!S.appels.length){el.innerHTML='<div class="es">Aucun appel de fonds. Créez le premier ci-dessus.</div>';return;}
+  el.innerHTML=S.appels.map(function(a,i){
+    var totDu=0,totPay=0;
+    a.copros.forEach(function(c){totDu+=c.lignes.reduce(function(s,l){return s+l.montant;},0);totPay+=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);});
+    var reste=totDu-totPay;var pct=totDu?Math.round(totPay/totDu*100):0;var allPay=reste<0.01;
+    return '<div class="appel-card">'+
+      '<div class="appel-header">'+
+        '<div>'+
+          '<strong style="font-size:14px">'+a.titre+'</strong>'+
+          (a.emission?' <span style="font-size:11px;color:var(--text3)">émis le '+fmtDate(a.emission)+'</span>':'')+
+          (a.echeance?' <span style="font-size:11px;color:var(--text3)">· échéance '+fmtDate(a.echeance)+'</span>':'')+
+        '</div>'+
+        '<span class="badge '+(allPay?'b-ok':reste>0?'b-err':'b-warn')+'">'+(allPay?'Soldé':Math.round(reste)+' € restants')+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--text2);margin-bottom:8px">'+a.lignes.map(function(l){return '<span class="badge b-n" style="margin-right:4px">'+l.nat+(l.periode?' – '+l.periode:'')+'</span>';}).join('')+'</div>'+
+      '<div class="appel-summary"><span>Total appelé : <strong>'+totDu.toFixed(2)+' €</strong></span><span>Recouvré : <strong>'+totPay.toFixed(2)+' €</strong></span><span>Reste : <strong style="color:'+(reste>0?'#e24b4a':'#63a020')+'">'+reste.toFixed(2)+' €</strong></span><span>Copropriétaires : <strong>'+a.copros.length+'</strong></span></div>'+
+      '<div class="pb" style="margin-top:6px"><div class="pf" style="width:'+pct+'%"></div></div>'+
+      '<div class="ab" style="margin-top:8px">'+
+        '<button class="btn btn-sm btn-p" onclick="showAppelDetail('+i+')">Suivi des paiements</button>'+
+        '<button class="btn btn-sm" onclick="editAppel('+i+')">Modifier</button>'+
+        '<button class="btn btn-sm" onclick="clotureAppel('+i+')">'+(a.statut==='clôturé'?'Ré-ouvrir':'Clôturer')+'</button>'+
+        '<button class="del btn-sm" onclick="delAppel('+i+')">Supprimer</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function delAppel(i){if(!confirm('Supprimer cet appel et tous ses paiements ?'))return;S.appels.splice(i,1);sv();renderAppels();G('appel-detail').style.display='none';populateCoprosSelects();updateDash();}
+function clotureAppel(i){S.appels[i].statut=S.appels[i].statut==='clôturé'?'actif':'clôturé';sv();renderAppels();}
+function editAppel(i){var a=S.appels[i];G('apl-titre').value=a.titre;G('apl-emission').value=a.emission||'';G('apl-echeance').value=a.echeance||'';G('apl-notes').value=a.notes||'';G('apl-edit-idx').value=i;G('appel-form-title').textContent='Modifier — '+a.titre;aplLignes=a.lignes.map(function(l){return Object.assign({},l);});renderLignes();window.scrollTo(0,0);}
+
+function showAppelDetail(i){
+  currentApelIdx=i;var a=S.appels[i];
+  G('appel-detail').style.display='block';
+  G('detail-titre').textContent='Suivi — '+a.titre;
+  var totDu=0,totPay=0;a.copros.forEach(function(c){totDu+=c.lignes.reduce(function(s,l){return s+l.montant;},0);totPay+=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);});
+  G('detail-summary').innerHTML='<div class="appel-summary"><span>Total : <strong>'+totDu.toFixed(2)+' €</strong></span><span>Payé : <strong>'+totPay.toFixed(2)+' €</strong></span><span>Reste : <strong style="color:'+(totDu-totPay>0?'#e24b4a':'#63a020')+'">'+(totDu-totPay).toFixed(2)+' €</strong></span><span>Taux : <strong>'+Math.round(totPay/totDu*100||0)+'%</strong></span></div>';
+  // FIX: reconstruire les en-têtes correctement
+  var th=G('detail-col-headers');
+  if(th){th.innerHTML=a.lignes.map(function(l){return '<th>'+l.nat+(l.periode?' ('+l.periode+')':'')+'</th>';}).join('');}
+  renderDetailTable();
+  G('appel-detail').scrollIntoView({behavior:'smooth'});
+}
+
+function renderDetailTable(){
+  var a=S.appels[currentApelIdx];if(!a)return;
+  var rows=a.copros.map(function(c,ci){
+    var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);
+    var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);
+    var reste=du-pay;var allPay=reste<0.01;
+    var lineCols=c.lignes.map(function(l,li){
+      var lpay=l.paye||0;var allLine=lpay>=l.montant-0.01;
+      return '<td style="text-align:right">'+
+        '<div style="font-size:10px;color:var(--text3)">Dû: '+l.montant.toFixed(2)+'</div>'+
+        '<input type="number" value="'+lpay.toFixed(2)+'" min="0" max="'+l.montant+'" step="0.01" style="width:80px;padding:3px 6px;font-size:11px;text-align:right;'+(allLine?'background:var(--green-bg)':'')+'" onchange="setLinePayment('+currentApelIdx+','+ci+','+li+',parseFloat(this.value)||0)"/>'+
+        '<div style="margin-top:3px"><input type="date" value="'+(l.date_paiement||'')+'" style="font-size:10px;padding:1px 4px;border-radius:4px;border:.5px solid var(--border2);color:var(--text2);background:var(--bg);width:120px" title="Date de paiement" onchange="setPayDate('+currentApelIdx+','+ci+','+li+',this.value)"/></div>'+
+      '</td>';
+    }).join('');
+    return '<tr class="'+(allPay?'pay-row-paid':'')+'"><td><span class="lchip">'+c.lot+'</span></td><td>'+(allPay?'<s>':'')+c.nom+(allPay?'</s>':'')+' <span class="badge b-n">'+c.tan+'</span></td><td>'+c.tan+'</td>'+lineCols+'<td style="text-align:right;font-weight:500">'+du.toFixed(2)+' €</td><td style="text-align:right;color:#63a020">'+pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(reste>0?'#e24b4a':'#63a020')+'">'+reste.toFixed(2)+' €</td><td><span class="badge '+(allPay?'b-ok':pay>0?'b-warn':'b-err')+'">'+(allPay?'Soldé':pay>0?'Partiel':'Impayé')+'</span></td><td><button class="btn btn-sm '+(allPay?'':'btn-p')+'" onclick="toggleFullPay('+currentApelIdx+','+ci+')">'+(allPay?'Annuler':'Tout payé')+'</button></td></tr>';
+  }).join('');
+  G('detail-tbody').innerHTML=rows;
+  var totDu=0,totPay=0;a.copros.forEach(function(c){totDu+=c.lignes.reduce(function(s,l){return s+l.montant;},0);totPay+=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);});
+  G('detail-foot').textContent='Recouvré : '+totPay.toFixed(2)+' € / '+totDu.toFixed(2)+' € ('+Math.round(totPay/totDu*100||0)+'%)';
+}
+
+function setLinePayment(ai,ci,li,val){var l=S.appels[ai].copros[ci].lignes[li];l.paye=Math.min(val,l.montant);if(l.paye>0&&!l.date_paiement)l.date_paiement=new Date().toISOString().slice(0,10);if(l.paye===0)delete l.date_paiement;sv();renderDetailTable();renderAppels();updateDash();}
+function setPayDate(ai,ci,li,val){var l=S.appels[ai].copros[ci].lignes[li];l.date_paiement=val||undefined;sv();}
+function toggleFullPay(ai,ci){var copro=S.appels[ai].copros[ci];var du=copro.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=copro.lignes.reduce(function(s,l){return s+(l.paye||0);},0);var isFull=du-pay<0.01;var today2=new Date().toISOString().slice(0,10);copro.lignes.forEach(function(l){l.paye=isFull?0:l.montant;if(!isFull&&!l.date_paiement)l.date_paiement=today2;if(isFull)delete l.date_paiement;});sv();renderDetailTable();renderAppels();updateDash();}
+
+function exportAppelCSV(){
+  var a=S.appels[currentApelIdx];if(!a)return;
+  var headers=['Lot','Copropriétaire','Tantièmes'].concat(a.lignes.map(function(l){return l.nat+(l.periode?' ('+l.periode+')':'');})).concat(['Total dû','Total payé','Reste','Statut']);
+  var rows=a.copros.map(function(c){var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);var reste=du-pay;return [c.lot,c.nom,c.tan].concat(c.lignes.map(function(l){return l.montant.toFixed(2);})).concat([du.toFixed(2),pay.toFixed(2),reste.toFixed(2),reste<0.01?'Soldé':pay>0?'Partiel':'Impayé']);});
+  var csv=[headers].concat(rows).map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(';');}).join('\n');
+  var b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  var link=document.createElement('a');link.href=URL.createObjectURL(b);link.download=a.titre.replace(/\s+/g,'_')+'.csv';link.click();
+}
+
+function printAppel(){
+  var a=S.appels[currentApelIdx];if(!a)return;
+  var totDu=0,totPay=0;a.copros.forEach(function(c){totDu+=c.lignes.reduce(function(s,l){return s+l.montant;},0);totPay+=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);});
+  var rows=a.copros.map(function(c){var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);return '<tr><td>'+c.lot+'</td><td>'+c.nom+'</td><td>'+c.tan+'</td>'+c.lignes.map(function(l){return '<td>'+l.montant.toFixed(2)+'</td>';}).join('')+'<td>'+du.toFixed(2)+'</td><td>'+pay.toFixed(2)+'</td><td>'+(du-pay).toFixed(2)+'</td></tr>';}).join('');
+  var ths=a.lignes.map(function(l){return '<th>'+l.nat+'</th>';}).join('');
+  var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><title>'+a.titre+'</title><style>body{font-family:Arial,sans-serif;font-size:11pt;padding:2cm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px;text-align:left}th{background:#f0f0f0}</style></head><body><h2>'+getNom()+' — '+a.titre+'</h2><p>Émis le '+fmtDate(a.emission)+' · Échéance '+fmtDate(a.echeance)+'</p><table><thead><tr><th>Lot</th><th>Copropriétaire</th><th>Tant.</th>'+ths+'<th>Total dû</th><th>Payé</th><th>Reste</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>');w.document.close();w.print();
+}
+
+// ─── FICHES APPEL DE FONDS PAR COPROPRIÉTAIRE ──────────────────────
+function renderFicheSelects(){
+  populateCoprosSelects();
+}
+
+function renderFiches(){
+  var apIdx=parseInt(G('fiche-appel-sel').value);
+  if(isNaN(apIdx)||apIdx<0||!S.appels[apIdx]){G('fiches-container').innerHTML='<div class="es">Sélectionnez un appel de fonds.</div>';return;}
+  var a=S.appels[apIdx];
+  var html=a.copros.map(function(c){return buildFicheHTML(a,c);}).join('');
+  G('fiches-container').innerHTML=html||'<div class="es">Aucun copropriétaire dans cet appel.</div>';
+}
+
+function renderFicheUnique(){
+  var apIdx=parseInt(G('fiche-appel-sel').value);
+  var copIdx=G('fiche-cop-sel').value;
+  if(isNaN(apIdx)||apIdx<0||!S.appels[apIdx]){renderFiches();return;}
+  var a=S.appels[apIdx];
+  if(copIdx===''){renderFiches();return;}
+  var cop=S.copros[parseInt(copIdx)];
+  if(!cop){renderFiches();return;}
+  // Chercher dans l'appel par nom (le lot peut être multiple)
+  var copData=a.copros.find(function(c){return c.nom===cop.pre+' '+cop.nom;});
+  if(!copData){
+    // Fallback: chercher par numéro de lot principal
+    var lotNums=getCopLotNums(cop);
+    copData=a.copros.find(function(c){return lotNums.indexOf(String(c.lot))>=0||String(c.lot)===lotNums[0];});
+  }
+  if(!copData){G('fiches-container').innerHTML='<div class="al al-w">Ce copropriétaire n\'est pas dans cet appel de fonds.</div>';return;}
+  G('fiches-container').innerHTML=buildFicheHTML(a,copData);
+}
+
+function buildFicheHTML(appel,copData){
+  var du=copData.lignes.reduce(function(s,l){return s+l.montant;},0);
+  var pay=copData.lignes.reduce(function(s,l){return s+(l.paye||0);},0);
+  var reste=du-pay;
+  var allPay=reste<0.01;
+  // Infos supplémentaires du copropriétaire (cherche par nom en priorité)
+  var copMaster=S.copros.find(function(c){return c.pre+' '+c.nom===copData.nom;})||S.copros.find(function(c){return copOwnsLot(c,copData.lot);});
+  var initials=(copData.nom||'?').split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();
+  return '<div class="fiche-card">'+
+    '<div class="fiche-header">'+
+      '<div class="fiche-avatar">'+initials+'</div>'+
+      '<div class="fiche-info" style="flex:1">'+
+        '<h4>Lot '+copData.lot+' — '+copData.nom+'</h4>'+
+        '<p>'+(copMaster&&copMaster.eta?copMaster.eta+' · ':'')+copData.tan+' tantièmes'+
+          (copMaster&&copMaster.occ?' · '+copMaster.occ:'')+
+          (copMaster&&copMaster.tel?' · '+copMaster.tel:'')+
+          (copMaster&&copMaster.email?' · '+copMaster.email:'')+
+        '</p>'+
+        '<p style="margin-top:3px;font-size:11px;color:var(--text3)">'+appel.titre+
+          (appel.emission?' · Émis le '+fmtDate(appel.emission):'')+
+          (appel.echeance?' · Échéance : '+fmtDate(appel.echeance):'')+
+        '</p>'+
+      '</div>'+
+      '<div class="fiche-solde">'+
+        '<div class="amount" style="color:'+(allPay?'#63a020':reste>0?'#e24b4a':'#63a020')+'">'+
+          (allPay?'Soldé ✓':reste.toFixed(2)+' €')+
+        '</div>'+
+        '<div style="font-size:11px;color:var(--text2)">'+(allPay?'Tout réglé':'restant dû')+'</div>'+
+        '<span class="badge '+(allPay?'b-ok':pay>0?'b-warn':'b-err')+'" style="margin-top:4px">'+(allPay?'Soldé':pay>0?'Partiel':'Impayé')+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<table>'+
+      '<thead><tr><th>Nature de la charge</th><th>Clé</th><th>Période</th><th style="text-align:right">Appelé</th><th style="text-align:right">Payé</th><th style="text-align:right">Reste</th><th>Statut</th></tr></thead>'+
+      '<tbody>'+copData.lignes.map(function(l){
+        var lr=l.montant-(l.paye||0);var lPay=lr<0.01;
+        return '<tr><td><strong>'+l.nat+'</strong></td><td><span class="badge b-n">'+l.cle+'</span></td><td>'+(l.periode||'—')+'</td><td style="text-align:right">'+l.montant.toFixed(2)+' €</td><td style="text-align:right;color:#63a020">'+(l.paye||0).toFixed(2)+' €</td><td style="text-align:right;color:'+(lr>0?'#e24b4a':'#63a020')+'">'+lr.toFixed(2)+' €</td><td><span class="badge '+(lPay?'b-ok':l.paye>0?'b-warn':'b-err')+'">'+(lPay?'Soldé':l.paye>0?'Partiel':'Impayé')+'</span></td></tr>';
+      }).join('')+
+      '<tr style="font-weight:500;background:var(--bg2)"><td colspan="3">Total</td><td style="text-align:right">'+du.toFixed(2)+' €</td><td style="text-align:right;color:#63a020">'+pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(reste>0?'#e24b4a':'#63a020')+'">'+reste.toFixed(2)+' €</td><td></td></tr>'+
+    '</tbody></table>'+
+    '<div style="margin-top:10px;font-size:11px;color:var(--text3)">'+
+      'Édité le '+today()+' — '+getSyn()+', syndic bénévole de '+getNom()+
+      (appel.notes?'<br><em>Note : '+appel.notes+'</em>':'')+
+    '</div>'+
+  '</div>';
+}
+
+function exportFicheDocx(){
+  var apIdx=parseInt(G('fiche-appel-sel').value);
+  if(isNaN(apIdx)||apIdx<0||!S.appels[apIdx])return alert('Sélectionnez un appel.');
+  var a=S.appels[apIdx];
+  var copIdx=G('fiche-cop-sel').value;
+  var targets=[];
+  if(copIdx===''){targets=a.copros;}
+  else{var cop=S.copros[parseInt(copIdx)];if(cop)targets=a.copros.filter(function(c){return String(c.lot)===String(cop.lot);});}
+  if(!targets.length)return alert('Aucun copropriétaire.');
+  var html=buildFichesHtmlExport(a,targets);
+  exportToWord(html,'Fiches_'+a.titre.replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10));
+}
+
+function buildFichesHtmlExport(a,targets){
+  var ribBlock='';
+  if(S.immeuble.rib)ribBlock='<p style="background:#eaf3de;padding:10px;border-left:4px solid #63a020;margin:12px 0"><strong>Virement à effectuer — IBAN : '+S.immeuble.rib+'</strong>'+(S.immeuble.banque?' · Banque : '+S.immeuble.banque:'')+(S.immeuble.domiciliation?' · '+S.immeuble.domiciliation:'')+'</p>';
+  return targets.map(function(c){
+    var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);
+    var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);var reste=du-pay;
+    var h='<h3 style="color:#1a56a0;margin:20px 0 4px">Lot '+c.lot+' — '+c.nom+'</h3>';
+    h+='<p style="margin-bottom:4px;font-size:10pt;color:#555">'+a.titre+(a.echeance?' · Échéance : '+fmtDate(a.echeance):'')+'</p>';
+    h+='<p style="background:#e8f0fe;padding:8px;border-left:4px solid #1a56a0;margin-bottom:10px">Total appelé : <strong>'+du.toFixed(2)+' €</strong> · Payé : <strong style="color:green">'+pay.toFixed(2)+' €</strong> · Reste : <strong style="color:'+(reste>0?'red':'green')+'">'+reste.toFixed(2)+' €</strong></p>';
+    h+=ribBlock;
+    h+='<table><thead><tr><th>Nature</th><th>Clé</th><th>Période</th><th>Appelé</th><th>Payé</th><th>Reste</th><th>Statut</th></tr></thead><tbody>';
+    c.lignes.forEach(function(l){var lr=l.montant-(l.paye||0);h+='<tr><td>'+l.nat+'</td><td>'+l.cle+'</td><td>'+(l.periode||'—')+'</td><td>'+l.montant.toFixed(2)+' €</td><td style="color:green">'+(l.paye||0).toFixed(2)+' €</td><td style="color:'+(lr>0?'red':'green')+'">'+lr.toFixed(2)+' €</td><td>'+(lr<0.01?'Soldé':l.paye>0?'Partiel':'Impayé')+'</td></tr>';});
+    h+='</tbody></table><hr style="margin:16px 0">';return h;
+  }).join('');
+}
+
+function exportFichePdf(){
+  var apIdx=parseInt(G('fiche-appel-sel').value);
+  if(isNaN(apIdx)||apIdx<0||!S.appels[apIdx])return alert('Sélectionnez un appel.');
+  var a=S.appels[apIdx];
+  var copIdx=G('fiche-cop-sel').value;
+  var targets=[];
+  if(copIdx===''){targets=a.copros;}
+  else{var cop=S.copros[parseInt(copIdx)];if(cop)targets=a.copros.filter(function(c){return String(c.lot)===String(cop.lot);});}
+  if(!targets.length)return alert('Aucun copropriétaire.');
+  var html=buildFichesHtmlExport(a,targets);
+  exportToPDF(html,'Fiches_'+a.titre);
+}
+
+function exportToutesFiches(){
+  var apIdx=parseInt(G('fiche-appel-sel').value);
+  if(isNaN(apIdx)||apIdx<0||!S.appels[apIdx])return alert('Sélectionnez un appel.');
+  var prev=G('fiche-cop-sel').value;
+  G('fiche-cop-sel').value='';
+  exportFicheDocx();
+  G('fiche-cop-sel').value=prev;
+}
+
+function printFiches(){
+  var container=G('fiches-container');
+  var w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>Fiches appel de fonds</title><style>body{font-family:Arial,sans-serif;font-size:10pt;padding:1.5cm}.fiche-card{border:1px solid #ccc;border-radius:8px;padding:16px;margin-bottom:20px;page-break-inside:avoid}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:5px 7px;text-align:left;font-size:9pt}th{background:#f0f0f0}</style></head><body>'+container.innerHTML+'</body></html>');
+  w.document.close();w.print();
+}
+
+// ─── RELEVÉ DE SITUATION ───────────────────────────────────────────
+function calcReleve(cop){
+  // cop peut être un objet copropriétaire ou un numéro de lot (rétrocompat)
+  var lotNums=typeof cop==='object'?getCopLotNums(cop):[String(cop)];
+  var copNom=typeof cop==='object'?cop.pre+' '+cop.nom:null;
+  var result=[];
+  S.appels.forEach(function(a){
+    // Cherche par nom d'abord (post multi-lots), puis par lot
+    var cd=null;
+    if(copNom)cd=a.copros.find(function(c){return c.nom===copNom;});
+    if(!cd)cd=a.copros.find(function(c){return lotNums.indexOf(String(c.lot))>=0;});
+    if(!cd)return;
+    var du=cd.lignes.reduce(function(s,l){return s+l.montant;},0);
+    var pay=cd.lignes.reduce(function(s,l){return s+(l.paye||0);},0);
+    result.push({appel:a.titre,emission:a.emission,echeance:a.echeance,du:du,pay:pay,reste:du-pay,details:cd.lignes.map(function(l){return {nat:l.nat,periode:l.periode,montant:l.montant,paye:l.paye||0};})});
+  });
+  return result;
+}
+
+function populateReleveSelect(){populateCoprosSelects();}
+
+function renderReleve(){
+  var sel=G('releve-select');var idx=sel?parseInt(sel.value):NaN;
+  if(isNaN(idx)||idx<0){G('releve-metrics').style.display='none';G('releve-detail').style.display='none';G('releve-empty').style.display='block';return;}
+  var cop=S.copros[idx];if(!cop){return;}
+  G('releve-empty').style.display='none';G('releve-metrics').style.display='grid';G('releve-detail').style.display='block';
+  var lignes=calcReleve(cop);
+  var totDu=lignes.reduce(function(s,l){return s+l.du;},0);
+  var totPay=lignes.reduce(function(s,l){return s+l.pay;},0);
+  var totReste=totDu-totPay;var taux=totDu?Math.round(totPay/totDu*100):0;
+  G('rel-total').textContent=totDu.toFixed(2)+' €';G('rel-paye').textContent=totPay.toFixed(2)+' €';G('rel-solde').textContent=totReste.toFixed(2)+' €';G('rel-taux').textContent=taux+'%';
+  G('rel-solde').style.color=totReste>0?'#e24b4a':'#63a020';
+  var lotsStr=getCopLotNums(cop).join(', ');
+  G('releve-titre').textContent='Relevé — Lot(s) '+lotsStr+' — '+cop.pre+' '+cop.nom;
+  if(!lignes.length){G('releve-body').innerHTML='<div class="es">Aucun appel de fonds pour ce copropriétaire.</div>';return;}
+  G('releve-body').innerHTML=lignes.map(function(l){
+    return '<div style="margin-bottom:14px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+        '<strong style="font-size:13px">'+l.appel+'</strong>'+
+        (l.echeance?'<span style="font-size:11px;color:var(--text3)">Éch. '+fmtDate(l.echeance)+'</span>':'')+
+        '<span class="badge '+(l.reste<0.01?'b-ok':l.pay>0?'b-warn':'b-err')+'">'+(l.reste<0.01?'Soldé':l.pay>0?'Partiel':'Impayé')+'</span>'+
+      '</div>'+
+      '<table><thead><tr><th>Nature</th><th>Période</th><th style="text-align:right">Appelé</th><th style="text-align:right">Payé</th><th style="text-align:right">Reste</th></tr></thead><tbody>'+
+      l.details.map(function(d){var dr=d.montant-(d.paye||0);return '<tr><td>'+d.nat+'</td><td>'+(d.periode||'—')+'</td><td style="text-align:right">'+d.montant.toFixed(2)+' €</td><td style="text-align:right;color:#63a020">'+(d.paye||0).toFixed(2)+' €</td><td style="text-align:right;color:'+(dr>0?'#e24b4a':'#63a020')+'">'+dr.toFixed(2)+' €</td></tr>';}).join('')+
+      '<tr style="font-weight:500;background:var(--bg2)"><td colspan="2">Total</td><td style="text-align:right">'+l.du.toFixed(2)+' €</td><td style="text-align:right;color:#63a020">'+l.pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(l.reste>0?'#e24b4a':'#63a020')+'">'+l.reste.toFixed(2)+' €</td></tr>'+
+      '</tbody></table></div>';
+  }).join('');
+  G('releve-footer').textContent='Édité le '+today()+' — '+getSyn()+', syndic bénévole de '+getNom();
+}
+
+function exportReleveDocx(){
+  var sel=G('releve-select');var idx=sel?parseInt(sel.value):NaN;
+  if(isNaN(idx)||idx<0||!S.copros[idx]){alert('Sélectionnez un copropriétaire.');return;}
+  var cop=S.copros[idx];var lignes=calcReleve(cop);
+  var lotsStr=getCopLotNums(cop).join('+');
+  var totDu=lignes.reduce(function(s,l){return s+l.du;},0);var totPay=lignes.reduce(function(s,l){return s+l.pay;},0);var totReste=totDu-totPay;
+  var html='<h2 style="color:#1a56a0">RELEVÉ DE SITUATION COMPTABLE</h2>';
+  html+='<h3>Lot(s) '+lotsStr+' — '+cop.pre+' '+cop.nom+'</h3>';
+  html+='<p style="color:#555;margin-bottom:12px">'+(cop.occ||'')+(cop.tel?' · '+cop.tel:'')+'</p>';
+  html+='<div style="background:#e8f0fe;padding:12px;border-left:4px solid #1a56a0;margin-bottom:16px"><strong>Total appelé : '+totDu.toFixed(2)+' €</strong> · Payé : <span style="color:green">'+totPay.toFixed(2)+' €</span> · Solde dû : <strong style="color:'+(totReste>0?'red':'green')+'">'+totReste.toFixed(2)+' €</strong></div>';
+  if(!lignes.length){html+='<p style="color:#888">Aucun appel de fonds.</p>';}
+  else{lignes.forEach(function(l){html+='<h3 style="color:#1a56a0;margin:20px 0 4px">'+l.appel+'</h3><p style="color:#777;font-size:9pt">'+(l.emission?'Émis le '+fmtDate(l.emission):'')+(l.echeance?' · Éch. '+fmtDate(l.echeance):'')+'</p><table><thead><tr><th>Nature</th><th>Période</th><th>Appelé</th><th>Payé</th><th>Reste</th><th>Statut</th></tr></thead><tbody>';l.details.forEach(function(d){var dr=d.montant-(d.paye||0);html+='<tr><td>'+d.nat+'</td><td>'+(d.periode||'—')+'</td><td style="text-align:right">'+d.montant.toFixed(2)+' €</td><td style="text-align:right;color:green">'+(d.paye||0).toFixed(2)+' €</td><td style="text-align:right;color:'+(dr>0?'red':'green')+'">'+dr.toFixed(2)+' €</td><td>'+(dr<0.01?'Soldé':d.paye>0?'Partiel':'Impayé')+'</td></tr>';});html+='<tr style="font-weight:bold;background:#e8edf5"><td colspan="2">Total</td><td style="text-align:right">'+l.du.toFixed(2)+' €</td><td style="text-align:right;color:green">'+l.pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(l.reste>0?'red':'green')+'">'+l.reste.toFixed(2)+' €</td><td>'+(l.reste<0.01?'Soldé':l.pay>0?'Partiel':'Impayé')+'</td></tr></tbody></table>';});}
+  html+='<p style="margin-top:20px;color:#888;font-size:9pt">Édité le '+today()+' par '+getSyn()+'</p>';
+  exportToWord(html,'Releve_Lot'+lotsStr+'_'+cop.nom.replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10));
+}
+
+function printReleve(){var releve=G('releve-detail');if(!releve||releve.style.display==='none'){alert('Sélectionnez un copropriétaire.');return;}var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><title>Relevé</title><style>body{font-family:Arial,sans-serif;font-size:10pt;padding:2cm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:5px;text-align:left}th{background:#f0f0f0}</style></head><body>'+releve.innerHTML+'</body></html>');w.document.close();w.print();}
+
+function exportTousReleves(){
+  if(!S.copros.length){alert('Aucun copropriétaire.');return;}
+  if(!confirm('Générer '+S.copros.length+' relevé(s) ? Chaque fichier sera téléchargé séquentiellement.'))return;
+  var i=0;function next(){if(i>=S.copros.length)return;var cop=S.copros[i];var lignes=calcReleve(cop);var lotsStr=getCopLotNums(cop).join('+');var totDu=lignes.reduce(function(s,l){return s+l.du;},0);var totPay=lignes.reduce(function(s,l){return s+l.pay;},0);var html='<h2 style="color:#1a56a0">RELEVÉ — Lot(s) '+lotsStr+' — '+cop.pre+' '+cop.nom+'</h2>';html+='<p style="font-weight:bold;color:'+(totDu-totPay>0?'red':'green')+'">Appelé : '+totDu.toFixed(2)+' € · Payé : '+totPay.toFixed(2)+' € · Solde : '+(totDu-totPay).toFixed(2)+' €</p>';exportToWord(html,'Releve_Lot'+lotsStr+'_'+cop.nom.replace(/\s+/g,'_'));i++;setTimeout(next,700);}next();
+}
+
+// ─── BUDGET ────────────────────────────────────────────────────────
+function autoFillBudCat(){var m={'601':'Personnel / entretien','611':'Personnel / entretien','615':'Personnel / entretien','616':'Assurances','621':'Personnel / entretien','622':'Frais administratifs','626':'Frais administratifs','628':'Eau et énergie','631':'Frais administratifs','641':'Personnel / entretien','645':'Personnel / entretien','671':'Divers','672':'Travaux','103':'Fonds travaux','701':'Divers','702':'Travaux','703':'Fonds travaux','758':'Divers'};var compte=G('bud-compte').value;if(compte&&m[compte])G('bud-cat').value=m[compte];}
+function addBudget(){var p=G('bud-p').value.trim();if(!p)return;S.budget.push({_id:Date.now()+Math.random(),p:p,pr:parseFloat(G('bud-pr').value)||0,re:parseFloat(G('bud-re').value)||0,cat:G('bud-cat').value,an:G('bud-an').value,compte:G('bud-compte').value});sv();renderBudget();G('bud-p').value='';G('bud-pr').value='';G('bud-re').value='';}
+
+// ─── IMPORT CONTRATS → BUDGET ──────────────────────────────────────
+function showImportContrats(){
+  var modal=G('modal-contrats');
+  if(!modal)return;
+  // Pré-remplir l'année courante
+  var anInput=G('import-contrat-an');
+  if(anInput&&!anInput.value)anInput.value=new Date().getFullYear();
+  // Lister les prestataires actifs avec un montant
+  var actifs=S.prestataires.filter(function(p){return p.sta==='actif'&&p.mnt>0;});
+  if(!actifs.length){
+    alert('Aucun prestataire actif avec un montant annuel renseigné.\n\nRenseignez d\'abord le montant annuel dans l\'onglet Prestataires.');
+    return;
+  }
+  // Comptes suggérés selon spécialité
+  var compteMap={
+    'Assurance immeuble':'616',
+    'Ascenseur':'611',
+    'Ménage':'621',
+    'Plomberie':'611',
+    'Électricité':'611',
+    'Jardinage':'621',
+    'Maçonnerie':'615',
+    'Désinsectisation':'611',
+    'Autre':'628'
+  };
+  var catMap={
+    'Assurance immeuble':'Assurances',
+    'Ascenseur':'Ascenseur',
+    'Ménage':'Personnel / entretien',
+    'Plomberie':'Personnel / entretien',
+    'Électricité':'Personnel / entretien',
+    'Jardinage':'Personnel / entretien',
+    'Maçonnerie':'Travaux',
+    'Désinsectisation':'Personnel / entretien',
+    'Autre':'Divers'
+  };
+  G('modal-contrats-list').innerHTML=actifs.map(function(p,i){
+    var compte=compteMap[p.spe]||'628';
+    var cat=catMap[p.spe]||'Divers';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:var(--radius);margin-bottom:6px;flex-wrap:wrap">'+
+      '<input type="checkbox" id="ic-'+i+'" value="'+i+'" checked style="width:16px;height:16px;flex-shrink:0"/>'+
+      '<div style="flex:1;min-width:150px">'+
+        '<div style="font-size:13px;font-weight:500">'+p.nom+'</div>'+
+        '<div style="font-size:11px;color:var(--text2)">'+p.spe+(p.ref?' · Réf : '+p.ref:'')+(p.fin?' · Jusqu\'au '+fmtDate(p.fin):'')+'</div>'+
+      '</div>'+
+      '<div style="font-size:13px;font-weight:500;color:var(--blue-text)">'+p.mnt.toLocaleString('fr-FR')+' €/an</div>'+
+      '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'+
+        '<input value="'+compte+'" id="ic-cpt-'+i+'" placeholder="Compte" style="width:55px;font-size:11px;padding:3px 6px;border-radius:5px;border:.5px solid var(--border2);background:var(--bg)" title="Compte comptable"/>'+
+        '<select id="ic-cat-'+i+'" style="font-size:11px;padding:3px 5px;border-radius:5px;border:.5px solid var(--border2);background:var(--bg)">'+
+          S.listes.categories_budget.map(function(cv){return '<option'+(cv===cat?' selected':'')+'>'+cv+'</option>';}).join('')+
+        '</select>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  modal.style.display='flex';
+}
+
+function closeModalContrats(){G('modal-contrats').style.display='none';}
+
+function selectAllContrats(){
+  G('modal-contrats-list').querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.checked=true;});
+}
+
+function doImportContrats(){
+  var an=G('import-contrat-an').value||String(new Date().getFullYear());
+  var actifs=S.prestataires.filter(function(p){return p.sta==='actif'&&p.mnt>0;});
+  var added=0,skipped=0;
+  actifs.forEach(function(p,i){
+    var cb=document.getElementById('ic-'+i);
+    if(!cb||!cb.checked)return;
+    var compte=document.getElementById('ic-cpt-'+i)?.value||'628';
+    var catEl=document.getElementById('ic-cat-'+i);
+    var cat=catEl?catEl.value:(S.listes.categories_budget[0]||'Divers');
+    // Vérifier si doublon (même nom + même année)
+    var exists=S.budget.some(function(b){return b.p===p.nom&&String(b.an)===String(an);});
+    if(exists){skipped++;return;}
+    S.budget.push({_id:Date.now()+Math.random()+i,p:p.nom,pr:p.mnt,re:0,cat:cat,an:an,compte:compte});
+    added++;
+  });
+  sv();
+  closeModalContrats();
+  renderBudget();
+  alert('✓ '+added+' poste(s) importé(s) dans le budget '+an+'.'+(skipped?' '+skipped+' doublon(s) ignoré(s).':''));
+}
+function updateBudgetReel(i,val){
+  if(i<0||i>=S.budget.length){alert('Erreur index budget. Rechargez la page.');return;}
+  S.budget[i].re=parseFloat(val)||0;
+  sv();
+}
+function delBudget(i){if(!confirm('Supprimer ?'))return;S.budget.splice(i,1);sv();renderBudget();}
+function renderBudget(){
+  var filtreEl=G('bud-filtre-an');
+  if(filtreEl){
+    var anSelected=filtreEl.value;
+    var curYear=String(new Date().getFullYear());
+    var ans=[...new Set(S.budget.map(function(b){return b.an;}).filter(Boolean))].sort();
+    // Auto-select current year on first render (when value is empty and current year exists)
+    if(!anSelected&&ans.indexOf(curYear)>=0)anSelected=curYear;
+    filtreEl.innerHTML='<option value="">Toutes</option>'+ans.map(function(a){return '<option value="'+a+'"'+(a===anSelected?' selected':'')+'>'+a+'</option>';}).join('');
+    if(anSelected)filtreEl.value=anSelected;
+  }
+  var anFiltre=filtreEl?filtreEl.value:'';
+  var postes=anFiltre?S.budget.filter(function(b){return String(b.an)===String(anFiltre);}):S.budget;
+  // Synthèse sur l'ensemble (toujours)
+  var tPrAll=S.budget.reduce(function(s,b){return s+b.pr;},0),tReAll=S.budget.reduce(function(s,b){return s+b.re;},0);
+  var pctAll=tPrAll?Math.round(tReAll/tPrAll*100):0;
+  G('bud-synth').innerHTML=
+    '<div class="hint" style="margin-bottom:8px;font-size:12px;color:var(--text2)">'+(anFiltre?'Exercice '+anFiltre+' sélectionné':'Tous exercices')+' — '+S.budget.length+' poste(s) total</div>'+
+    '<div class="metric" style="margin-bottom:8px"><div class="ml">Prévu (global)</div><div class="mv">'+Math.round(tPrAll)+' €</div></div>'+
+    '<div class="metric" style="margin-bottom:8px"><div class="ml">Réel (global)</div><div class="mv" style="color:'+(tReAll>tPrAll?'#e24b4a':'#63a020')+'">'+Math.round(tReAll)+' €</div></div>'+
+    '<div class="metric"><div class="ml">Exécution</div><div class="mv">'+pctAll+' %</div></div>'+
+    '<div class="pb" style="margin-top:10px"><div class="pf" style="width:'+Math.min(pctAll,100)+'%"></div></div>'+
+    (anFiltre&&postes.length?'<div class="hr"></div><div style="font-size:12px;color:var(--text2)">Exercice <strong>'+anFiltre+'</strong> : Prévu <strong>'+postes.reduce(function(s,b){return s+b.pr;},0).toFixed(2)+' €</strong> · Réel <strong>'+postes.reduce(function(s,b){return s+b.re;},0).toFixed(2)+' €</strong></div>':'');
+  if(!postes.length){G('bud-list').innerHTML='<div class="es">Aucun poste'+(anFiltre?' pour '+anFiltre:'')+'.</div>';return;}
+  G('bud-list').innerHTML='<table><thead><tr><th>Poste</th>'+(anFiltre?'':'<th>Année</th>')+'<th>Catégorie</th><th>Compte</th><th style="text-align:right">Prévu</th><th style="min-width:130px;text-align:right">Réel ✎</th><th style="text-align:right">Écart</th><th></th></tr></thead><tbody>'+
+    postes.map(function(b, pi){
+      // Trouver l'index réel dans S.budget en cherchant par position dans le tableau filtré
+      var bid=b._id;
+      var i=bid!==undefined?S.budget.findIndex(function(x){return x._id===bid;}):S.budget.findIndex(function(x){return x.p===b.p&&String(x.an)===String(b.an)&&x.pr===b.pr;});
+      var e=b.re-b.pr;
+      return '<tr><td><strong>'+b.p+'</strong></td>'+
+        (anFiltre?'':'<td style="font-size:11px;color:var(--text3)">'+(b.an||'—')+'</td>')+
+        '<td><span class="badge b-n">'+b.cat+'</span></td>'+
+        '<td style="font-size:10px;color:var(--text2)">'+(b.compte||'—')+'</td>'+
+        '<td style="text-align:right">'+b.pr.toFixed(2)+' €</td>'+
+        '<td style="text-align:right;vertical-align:middle"><input type="number" value="'+b.re+'" min="0" step="0.01" style="width:110px;padding:3px 7px;font-size:12px;text-align:right;border-radius:6px;border:.5px solid var(--border2);background:'+(b.re>0?'var(--green-bg)':'var(--bg)')+'" onchange="updateBudgetReel('+i+',this.value)" title="Modifier le montant réel"/></td>'+
+        '<td style="text-align:right;font-weight:500;color:'+(e>0?'#e24b4a':e<0?'#63a020':'var(--text2)')+'">'+(e>0?'▲ +':e<0?'▼ ':'')+Math.abs(e).toFixed(2)+' €</td>'+
+        '<td><button class="del" onclick="delBudget('+i+')">✕</button></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+
+function exportBudgetWord(){
+  var anFiltre=G('bud-filtre-an')?G('bud-filtre-an').value:'';
+  var postes=anFiltre?S.budget.filter(function(b){return String(b.an)===String(anFiltre);}):S.budget;
+  if(!postes.length){alert('Aucun poste à exporter.');return;}
+  var tPr=postes.reduce(function(s,b){return s+b.pr;},0);var tRe=postes.reduce(function(s,b){return s+b.re;},0);var pct=tPr?Math.round(tRe/tPr*100):0;
+  var html='<h2 style="color:#1a56a0">BUDGET PRÉVISIONNEL'+(anFiltre?' — '+anFiltre:'')+'</h2>';
+  html+='<p style="background:#e8f0fe;padding:10px;border-left:4px solid #1a56a0;margin-bottom:14px"><strong>Prévu : '+tPr.toFixed(2)+' €</strong> · Réel : '+tRe.toFixed(2)+' € · Exécution : '+pct+' %</p>';
+  html+='<table><thead><tr><th>Poste</th>'+(anFiltre?'':'<th>Année</th>')+'<th>Catégorie</th><th>Compte</th><th style="text-align:right">Prévu</th><th style="text-align:right">Réel</th><th style="text-align:right">Écart</th></tr></thead><tbody>';
+  postes.forEach(function(b){var e=b.re-b.pr;html+='<tr><td><strong>'+b.p+'</strong></td>'+(anFiltre?'':'<td>'+(b.an||'—')+'</td>')+'<td>'+b.cat+'</td><td style="font-size:10pt">'+(b.compte||'—')+'</td><td style="text-align:right">'+b.pr.toFixed(2)+' €</td><td style="text-align:right;color:green">'+b.re.toFixed(2)+' €</td><td style="text-align:right;color:'+(e>0?'red':e<0?'green':'#555')+'">'+(e>0?'+':'')+e.toFixed(2)+' €</td></tr>';});
+  html+='</tbody></table><p style="margin-top:16px;color:#888;font-size:9pt">Généré le '+today()+' — '+getSyn()+'</p>';
+  exportToWord(html,'Budget'+(anFiltre?'_'+anFiltre:'')+'_'+getNom().replace(/\s+/g,'_'));
+}
+
+function addFonds(){var mnt=parseFloat(G('ft-mnt').value)||0;var desc=G('ft-desc').value.trim();if(!mnt||!desc)return;S.fonds.push({type:G('ft-type').value==='provision'?'provision':'depense',mnt:mnt,dt:G('ft-dt').value,desc:desc});sv();renderFonds();G('ft-mnt').value='';G('ft-desc').value='';}
+function renderFonds(){
+  // Calculer les coûts des interventions travaux pour comparaison
+  var coutTravaux=S.interventions.filter(function(i){return i.type==='Travaux votés en AG'||i.type==='Réparation urgente';}).reduce(function(s,i){return s+(i.cout||0);},0);
+  var budFonds=S.budget.filter(function(b){return b.compte==='103'||b.cat==='Fonds travaux';}).reduce(function(s,b){return s+b.pr;},0);
+  var ftSynth=G('ft-synthese');
+  if(ftSynth){ftSynth.innerHTML='<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px"><span>Provisions budget (cpt 103) : <strong>'+budFonds.toFixed(2)+' €</strong></span><span>Coût interventions travaux : <strong>'+coutTravaux.toFixed(2)+' €</strong></span><button class="btn btn-sm" style="margin-left:auto" onclick="T(&apos;batiment&apos;)">→ Carnet entretien</button><button class="btn btn-sm" onclick="T(&apos;budget&apos;)">→ Budget</button></div>';}var prov=S.fonds.filter(function(f){return f.type==='provision';}).reduce(function(s,f){return s+f.mnt;},0);var dep=S.fonds.filter(function(f){return f.type==='depense';}).reduce(function(s,f){return s+f.mnt;},0);G('ft-solde').textContent=Math.round(prov-dep)+' €';G('ft-prov').textContent=Math.round(prov)+' €';G('ft-dep').textContent=Math.round(dep)+' €';if(!S.fonds.length){G('ft-list').innerHTML='<div class="es">Aucune opération.</div>';return;}G('ft-list').innerHTML='<table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Montant</th><th></th></tr></thead><tbody>'+S.fonds.slice().reverse().map(function(f,i){var ri=S.fonds.length-1-i;return '<tr><td>'+fmtDate(f.dt)+'</td><td><span class="badge '+(f.type==='provision'?'b-ok':'b-err')+'">'+(f.type==='provision'?'Provision':'Dépense')+'</span></td><td>'+f.desc+'</td><td>'+(f.type==='provision'?'+':'-')+Math.round(f.mnt)+' €</td><td><button class="del" onclick="delFonds('+ri+')">✕</button></td></tr>';}).join('')+'</tbody></table>';}
+function delFonds(i){if(!confirm('Supprimer ?'))return;S.fonds.splice(i,1);sv();renderFonds();}
+
+// ─── SINISTRES ─────────────────────────────────────────────────────
+function addSinistre(){var desc=G('sin-desc').value.trim();if(!desc)return;S.sinistres.push({nat:G('sin-nat').value,dt:G('sin-dt').value,loc:G('sin-loc').value.trim(),desc:desc,ass:G('sin-ass').value.trim(),pol:G('sin-pol').value.trim(),dos:G('sin-dos').value.trim(),exp:G('sin-exp').value.trim(),mnt:parseFloat(G('sin-mnt').value)||0,sta:G('sin-sta').value});sv();renderSinistres();updateDash();G('sin-desc').value='';G('sin-mnt').value='';}
+function renderSinistres(){if(!S.sinistres.length){G('sin-list').innerHTML='<div class="es">Aucun sinistre.</div>';return;}G('sin-list').innerHTML=S.sinistres.map(function(s,i){return '<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><div><strong>'+s.nat+'</strong> <span class="badge b-n">'+s.sta+'</span></div><button class="del" onclick="delSin('+i+')">✕</button></div><div style="font-size:11px;color:var(--text2);margin-top:4px">'+fmtDate(s.dt)+' — '+s.loc+'</div><div style="font-size:12px;margin-top:4px">'+s.desc+'</div>'+(s.ass?'<div style="font-size:11px;color:var(--text3);margin-top:3px">Assureur : '+s.ass+(s.dos?' · Dossier : '+s.dos:'')+'</div>':'')+'<div class="ab" style="margin-top:6px"><select onchange="updSin('+i+',this.value)" style="width:auto">'+S.listes.statuts_sinistre.map(function(v){return '<option'+(v===s.sta?' selected':'')+' value="'+v+'">'+v+'</option>';}).join('')+'</select></div></div>';}).join('');}
+function delSin(i){if(!confirm('Supprimer ?'))return;S.sinistres.splice(i,1);sv();renderSinistres();updateDash();}
+function updSin(i,v){S.sinistres[i].sta=v;sv();renderSinistres();updateDash();}
+
+// ─── LOCATIONS ─────────────────────────────────────────────────────
+function addLocation(){var loc=G('loc-loc').value.trim(),ref=G('loc-ref').value.trim();if(!loc||!ref)return;S.locations.push({type:G('loc-type').value,ref:ref,loc:loc,tel:G('loc-tel').value.trim(),loy:parseFloat(G('loc-loy').value)||0,dep:parseFloat(G('loc-dep').value)||0,deb:G('loc-deb').value,fin:G('loc-fin').value,paie:[]});sv();renderLocations();['loc-loc','loc-tel','loc-loy','loc-dep'].forEach(function(id){G(id).value='';}); }
+function renderLocations(){if(!S.locations.length){G('loc-list').innerHTML='<div class="es">Aucune location.</div>';return;}var rev=S.locations.reduce(function(s,l){return s+(l.loy||0);},0);G('loc-list').innerHTML='<div class="hint" style="margin-bottom:8px">Revenus mensuels : <strong>'+Math.round(rev)+' €</strong></div>'+S.locations.map(function(l,i){return '<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><div><strong>'+l.ref+'</strong> <span class="badge b-n">'+l.type+'</span></div><button class="del" onclick="delLoc('+i+')">✕</button></div><div style="font-size:11px;color:var(--text2);margin-top:3px">'+l.loc+(l.tel?' · '+l.tel:'')+'</div><div style="font-size:11px;color:var(--text2)">'+Math.round(l.loy)+' €/mois</div><div class="ab" style="margin-top:5px"><button class="btn btn-sm" onclick="locPaie('+i+')">Suivi paiements</button></div></div>';}).join('');}
+function delLoc(i){if(!confirm('Supprimer ?'))return;S.locations.splice(i,1);sv();renderLocations();}
+function locPaie(i){var l=S.locations[i];var now=new Date();var months=[];for(var m=5;m>=0;m--){var d=new Date(now.getFullYear(),now.getMonth()-m,1);months.push({y:d.getFullYear(),m:d.getMonth()});}var mn=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];G('loc-paie').innerHTML='<strong style="font-size:12px">'+l.ref+' — '+l.loc+'</strong><table style="margin-top:8px"><thead><tr><th>Mois</th><th>Loyer</th><th>Statut</th></tr></thead><tbody>'+months.map(function(md){var key=md.y+'-'+md.m;var p=(l.paie||[]).find(function(x){return x.key===key;});return '<tr><td>'+mn[md.m]+' '+md.y+'</td><td>'+Math.round(l.loy)+' €</td><td><span class="badge '+(p?'b-ok':'b-err')+'">'+(p?'Payé':'Impayé')+'</span> <button class="btn btn-sm" onclick="toggleLocPaie('+i+',\''+key+'\')">Basculer</button></td></tr>';}).join('')+'</tbody></table>';}
+function toggleLocPaie(li,key){var l=S.locations[li];if(!l.paie)l.paie=[];var idx=l.paie.findIndex(function(p){return p.key===key;});if(idx>=0)l.paie.splice(idx,1);else l.paie.push({key:key});sv();locPaie(li);}
+
+// ─── BÂTIMENT ──────────────────────────────────────────────────────
+function addIntervention(){var desc=G('bat-desc').value.trim();if(!desc)return;S.interventions.push({type:G('bat-type').value,dt:G('bat-dt').value,loc:G('bat-loc').value,desc:desc,cout:parseFloat(G('bat-cout').value)||0,int:G('bat-int').value.trim(),sta:G('bat-sta').value});sv();renderInterventions();updateDash();G('bat-desc').value='';G('bat-cout').value='';G('bat-int').value='';}
+function addCtrl(n){S.interventions.push({type:'Contrôle réglementaire',dt:new Date().toISOString().slice(0,10),loc:'Parties communes',desc:n,cout:0,int:'',sta:'terminé'});sv();renderInterventions();}
+function updIntSta(i,v){S.interventions[i].sta=v;sv();renderInterventions();updateDash();}
+function renderInterventions(){
+  if(!S.interventions.length){G('bat-list').innerHTML='<div class="es">Aucune intervention.</div>';return;}
+  var bc={terminé:'b-ok',urgent:'b-err','en cours':'b-info',planifié:'b-warn'};
+  var coutTotal=S.interventions.reduce(function(s,i){return s+(i.cout||0);},0);
+  var coutFonds=S.fonds.filter(function(f){return f.type==='depense';}).reduce(function(s,f){return s+f.mnt;},0);
+  // Banner sync
+  var banner=G('bat-sync-banner');
+  if(banner){var diff=Math.round(coutTotal-coutFonds);banner.style.display=diff>0?'flex':'none';if(diff>0)banner.innerHTML='⚠ <strong>'+diff.toFixed(0)+' €</strong> de coûts d\'intervention non encore reportés dans le fonds travaux ou le budget. <button class="btn btn-sm" style="margin-left:8px" onclick="T(\'fonds\')">Saisir dans Fonds travaux</button><button class="btn btn-sm" style="margin-left:4px" onclick="T(\'budget\')">Saisir dans Budget</button>';}
+  G('bat-list').innerHTML='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Coût total interventions : <strong>'+coutTotal.toFixed(2)+' €</strong> · Dont dépenses fonds travaux : <strong>'+coutFonds.toFixed(2)+' €</strong></div>'+
+    '<table><thead><tr><th>Date</th><th>Type</th><th>Lieu</th><th>Description</th><th>Coût</th><th>Intervenant</th><th>Statut</th><th style="min-width:120px">Actions</th></tr></thead><tbody>'+
+    S.interventions.map(function(iv,idx){
+      var staOpts=S.listes.statuts_intervention.map(function(v){return '<option value="'+v+'"'+(v===iv.sta?' selected':'')+'>'+v+'</option>';}).join('');
+      return '<tr><td>'+fmtDate(iv.dt)+'</td><td style="font-size:11px">'+iv.type+'</td><td style="font-size:11px">'+iv.loc+'</td><td>'+iv.desc+'</td><td>'+(iv.cout?Math.round(iv.cout)+' €':'—')+'</td><td style="font-size:11px">'+(iv.int||'—')+'</td>'+
+        '<td><span class="badge '+(bc[iv.sta]||'b-n')+'">'+iv.sta+'</span></td>'+
+        '<td><div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">'+
+          '<select onchange="updIntSta('+idx+',this.value)" style="font-size:11px;padding:2px 4px;border-radius:5px;border:.5px solid var(--border2);background:var(--bg);color:var(--text)">'+staOpts+'</select>'+
+          (iv.cout>0?'<button class="btn btn-sm" onclick="prefillFonds('+idx+')" title="Créer une dépense fonds travaux" style="font-size:10px;padding:2px 6px">→ FT</button>':'')+''+
+          '<button class="del" onclick="delInt('+idx+')">✕</button>'+
+        '</div></td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function prefillFonds(idx){
+  var iv=S.interventions[idx];
+  T('fonds');
+  setTimeout(function(){
+    var mnt=G('ft-mnt'),desc=G('ft-desc'),dt=G('ft-dt'),type=G('ft-type');
+    if(mnt)mnt.value=iv.cout||0;
+    if(desc)desc.value=iv.type+' — '+iv.desc+(iv.int?' ('+iv.int+')':'');
+    if(dt&&iv.dt)dt.value=iv.dt;
+    if(type)type.value='depense';
+  },100);
+}
+function delInt(i){if(!confirm('Supprimer ?'))return;S.interventions.splice(i,1);sv();renderInterventions();}
+
+// ─── PRESTATAIRES ──────────────────────────────────────────────────
+function addPrest(){var nom=G('pr-nom').value.trim();if(!nom)return;S.prestataires.push({nom:nom,spe:G('pr-spe').value,tel:G('pr-tel').value.trim(),email:G('pr-email').value.trim(),deb:G('pr-deb').value,fin:G('pr-fin').value,mnt:parseFloat(G('pr-mnt').value)||0,ref:G('pr-ref').value.trim(),sta:G('pr-sta').value,notes:G('pr-notes').value.trim()});sv();renderPrestataires();updateDash();['pr-nom','pr-tel','pr-email','pr-deb','pr-fin','pr-mnt','pr-ref','pr-notes'].forEach(function(id){G(id).value='';}); }
+function delPrest(i){if(!confirm('Supprimer ?'))return;S.prestataires.splice(i,1);sv();renderPrestataires();}
+function renderPrestataires(){var now=new Date();if(!S.prestataires.length){G('pr-list').innerHTML='<div class="es">Aucun prestataire.</div>';return;}G('pr-list').innerHTML=S.prestataires.map(function(p,i){var exp=p.fin&&(new Date(p.fin)-now)/864e5<60;return '<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><div><strong>'+p.nom+'</strong> <span class="badge b-n">'+p.spe+'</span>'+(exp?'<span class="badge b-warn" style="margin-left:4px">Expire bientôt</span>':'')+'</div><button class="del" onclick="delPrest('+i+')">✕</button></div><div style="font-size:11px;color:var(--text2);margin-top:4px">'+(p.tel?'Tél : '+p.tel:'')+(p.email?' · '+p.email:'')+(p.ref?'<br>Réf : '+p.ref:'')+'</div><div style="font-size:11px;color:var(--text2)">'+(p.deb?'Du '+fmtDate(p.deb):'')+(p.fin?' au '+fmtDate(p.fin):'')+(p.mnt?' · '+Math.round(p.mnt)+' €/an':'')+'</div><div style="margin-top:5px"><span class="badge '+(p.sta==='actif'?'b-ok':p.sta==='résilié'?'b-err':'b-warn')+'">'+p.sta+'</span></div>'+(p.notes?'<div style="font-size:11px;color:var(--text3);margin-top:3px">'+p.notes+'</div>':'')+'</div>';}).join('');}
+
+// ─── CLÉS ──────────────────────────────────────────────────────────
+function addCle(){var dest=G('cle-dest').value.trim();if(!dest)return;S.cles.push({type:G('cle-type').value,ref:G('cle-ref').value.trim(),dest:dest,lot:G('cle-lot-sel').value,drem:G('cle-drem').value,cau:parseFloat(G('cle-cau').value)||0,sta:G('cle-sta').value,notes:G('cle-notes').value.trim()});sv();renderCles();['cle-ref','cle-dest','cle-cau','cle-notes'].forEach(function(id){G(id).value='';}); }
+function delCle(i){if(!confirm('Supprimer ?'))return;S.cles.splice(i,1);sv();renderCles();}
+function renderCles(){if(!S.cles.length){G('cle-list').innerHTML='<div class="es">Aucun accès enregistré.</div>';G('cle-stats').textContent='';return;}var remis=S.cles.filter(function(c){return c.sta==='remis';}).length;var cau=S.cles.reduce(function(s,c){return s+(c.cau||0);},0);G('cle-stats').innerHTML='<strong>'+remis+'</strong> accès en circulation · Cautions : <strong>'+Math.round(cau)+' €</strong>';G('cle-list').innerHTML='<table><thead><tr><th>Type</th><th>Réf.</th><th>Remis à</th><th>Lot</th><th>Date</th><th>Caution</th><th>Statut</th><th></th></tr></thead><tbody>'+S.cles.map(function(c,i){return '<tr><td>'+c.type+'</td><td>'+c.ref+'</td><td>'+c.dest+'</td><td>'+(c.lot?'<span class="lchip">'+c.lot+'</span>':'—')+'</td><td>'+fmtDate(c.drem)+'</td><td>'+(c.cau?Math.round(c.cau)+' €':'—')+'</td><td><span class="badge '+(c.sta==='remis'?'b-ok':c.sta==='perdu'?'b-err':'b-n')+'">'+c.sta+'</span></td><td><button class="del" onclick="delCle('+i+')">✕</button></td></tr>';}).join('')+'</tbody></table>';}
+
+// ─── AG ────────────────────────────────────────────────────────────
+function applyAG(){G('ag-dt').value=S.ag.dt||'';G('ag-h').value=S.ag.h||'18:00';G('ag-lieu').value=S.ag.lieu||'';G('ag-type').value=S.ag.type||'Assemblée générale ordinaire';renderOdj();}
+function saveAG(){S.ag.dt=G('ag-dt').value;S.ag.h=G('ag-h').value;S.ag.lieu=G('ag-lieu').value;S.ag.type=G('ag-type').value;sv();}
+function addOdj(){var v=G('ag-odj-in').value.trim();if(!v)return;S.ag.odj.push(v);G('ag-odj-in').value='';saveAG();renderOdj();}
+function delOdj(i){S.ag.odj.splice(i,1);saveAG();renderOdj();}
+function renderOdj(){G('ag-odj-list').innerHTML=S.ag.odj.map(function(p,i){return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px"><span style="color:var(--text3);min-width:16px">'+(i+1)+'.</span><span style="flex:1">'+p+'</span><button class="del" onclick="delOdj('+i+')">✕</button></div>';}).join('')||'<div style="font-size:12px;color:var(--text3)">Aucun point.</div>';}
+function genConv(){saveAG();var odj=S.ag.odj.map(function(p,i){return '   '+(i+1)+'. '+p;}).join('\n')||'   1. Questions diverses';G('ag-doc').textContent=getNom()+'\n'+getAdr()+'\n\nAjaccio, le '+today()+'\n\nOBJET : Convocation à l\''+S.ag.type+'\n'+'═'.repeat(42)+'\n\nMadame, Monsieur,\n\nNous vous convoquons à l\''+S.ag.type.toLowerCase()+'\nde la copropriété '+getNom()+'.\n\n  Date    : '+fmtDate(S.ag.dt)+'\n  Heure   : '+(S.ag.h||'—')+'\n  Lieu    : '+(S.ag.lieu||getAdr())+'\n\nORDRE DU JOUR :\n'+odj+'\n\nConformément à la loi du 10 juillet 1965, les documents sont tenus\nà votre disposition.\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole — '+getNom();}
+function genPV(){saveAG();var res=S.ag.odj.map(function(p,i){return 'RÉSOLUTION N°'+(i+1)+'\nObjet : '+p+'\n\n  Approuvé □   Refusé □   Abstention □\n  La résolution est : ADOPTÉE □  REJETÉE □\n\n';}).join('─'.repeat(40)+'\n\n');G('ag-doc').textContent='PROCÈS-VERBAL\n'+S.ag.type.toUpperCase()+'\nDU '+fmtDate(S.ag.dt)+'\n\n'+getNom()+' — '+getAdr()+'\n'+'═'.repeat(42)+'\n\nCopropriétaires présents     : ____ / ____\nCopropriétaires représentés  : ____\nTantièmes représentés        : ____ / 10000\n\nPrésident(e) : ________________________\nSecrétaire   : ________________________\n\n'+'─'.repeat(40)+'\n\n'+(res||'Résolution n°1 : Questions diverses\n')+'═'.repeat(40)+'\n\nClos à ____ h ____.\n\nLe Président(e)           Le Secrétaire\n_____________________  _____________________';}
+function genFeuille(){saveAG();var rows=S.copros.map(function(c){return (c.pre+' '+c.nom).slice(0,28).padEnd(30)+String(c.lot).padEnd(7)+String(c.tan).padEnd(10)+'□    □';}).join('\n');G('ag-doc').textContent='FEUILLE DE PRÉSENCE — '+S.ag.type.toUpperCase()+' DU '+fmtDate(S.ag.dt)+'\n\n'+getNom()+'\n'+'═'.repeat(60)+'\n'+'NOM'.padEnd(30)+'LOT'.padEnd(7)+'TANT.'.padEnd(10)+'PRÉS.  REPR.\n'+'─'.repeat(60)+'\n'+(rows||'(Aucun copropriétaire enregistré)')+'\n'+'─'.repeat(60)+'\nTOTAL TANTIÈMES : ____________ / 100000';}
+function archiveAG(){saveAG();if(!S.ag.dt)return alert('Renseignez la date de l\'AG.');var pts=prompt('Résolutions votées :','0');var notes=prompt('Notes :','');S.ag_hist.push({dt:S.ag.dt,type:S.ag.type,pts:pts,notes:notes});sv();renderAGHist();alert('AG archivée.');}
+function renderAGHist(){if(!S.ag_hist.length){G('ag-hist').innerHTML='<tr><td colspan="5" class="es">Aucune AG archivée.</td></tr>';return;}G('ag-hist').innerHTML=S.ag_hist.map(function(a,i){return '<tr><td>'+fmtDate(a.dt)+'</td><td>'+a.type+'</td><td>'+(a.pts||0)+' résolutions</td><td>'+(a.notes||'—')+'</td><td><button class="del" onclick="delAG('+i+')">✕</button></td></tr>';}).join('');}
+function delAG(i){if(!confirm('Supprimer ?'))return;S.ag_hist.splice(i,1);sv();renderAGHist();}
+
+// ─── COURRIERS ─────────────────────────────────────────────────────
+function autoFillCourrierDest(){
+  var idx=G('co-dest-cop').value;
+  if(idx==='')return;
+  var cop=S.copros[parseInt(idx)];
+  if(cop)G('co-dest').value=cop.pre+' '+cop.nom+', Lot(s) n°'+getCopLotNums(cop).join('+')+(cop.occ?' — '+cop.occ:'');
+}
+function genCourrier(){
+  var type=G('co-type').value,dest=G('co-dest').value||'Madame, Monsieur',det=G('co-det').value;
+  var dt=G('co-dt').value?new Date(G('co-dt').value+'T12:00:00').toLocaleDateString('fr-FR'):today();
+  var ent=getNom()+'\n'+getAdr()+'\n\nAjaccio, le '+dt+'\n\nÀ l\'attention de : '+dest+'\n\n';
+  var tpl={
+    relance1:{o:'Relance amiable — charges de copropriété',t:'Sauf erreur, nous n\'avons pas reçu le règlement de votre quote-part.\n\n'+(det||'Montant dû : ______ €\nPériode : ______')+'\n\nNous vous serions reconnaissants de régulariser dans les meilleurs délais.\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole'},
+    relance2:{o:'Deuxième relance — charges impayées',t:'Malgré notre courrier précédent, nous n\'avons pas reçu votre paiement.\n\n'+(det||'Montant dû : ______ €')+'\n\nNous vous demandons de régulariser dans les 15 jours. Passé ce délai, nous engagerons la procédure de recouvrement.\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole'},
+    demise:{o:'Mise en demeure — charges impayées (LRAR)',t:'Nous vous mettons formellement en demeure de régler dans 8 jours :\n\n'+(det||'Montant : ______ €')+'\n\nA défaut, nous saisirons le Tribunal Judiciaire compétent.\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole\n[Recommandé avec AR]'},
+    convoc:{o:'Convocation à l\'assemblée générale',t:'Nous vous invitons à l\'assemblée générale.\n\n'+(det||'Date : ______\nHeure : ______\nLieu : ______')+'\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole'},
+    travaux:{o:'Notification de travaux',t:'Des travaux vont être réalisés dans les parties communes.\n\n'+(det||'Nature : ______\nPériode : ______\nEntreprise : ______')+'\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole'},
+    sinistre:{o:'Déclaration de sinistre',t:'Nous vous signalons un sinistre survenu dans notre immeuble.\n\n'+(det||'Nature : ______\nDate : ______\nLocalisation : ______')+'\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole — '+getNom()},
+    nuisances:{o:'Signalement de nuisances',t:'Nous avons été saisis de plaintes concernant des nuisances.\n\n'+(det||'Nature : ______\nLocalisation : ______')+'\n\nNous vous demandons de prendre les mesures nécessaires.\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole'},
+    bienvenue:{o:'Bienvenue dans la copropriété '+getNom(),t:'Nous sommes heureux de vous accueillir au sein de la copropriété '+getNom()+'.\n\n'+(det||'')+'\n\nNous tenons à votre disposition :\n - Le règlement de copropriété\n - Le carnet d\'entretien\n - Les derniers procès-verbaux d\'AG\n\nVeuillez agréer nos salutations distinguées.\n\n'+getSyn()+'\nSyndic bénévole'}
+  };
+  var t=tpl[type]||tpl.relance1;G('co-prev').textContent=ent+'OBJET : '+t.o+'\n\n'+t.t;
+}
+
+// ─── URGENCES ──────────────────────────────────────────────────────
+function addUrgence(){var nom=G('urg-nom').value.trim();if(!nom)return;S.urgences.push({nom:nom,role:G('urg-role').value.trim(),tel:G('urg-tel').value.trim(),dispo:G('urg-dispo').value,notes:G('urg-notes').value.trim()});sv();renderUrgences();['urg-nom','urg-role','urg-tel','urg-notes'].forEach(function(id){G(id).value='';}); }
+function delUrg(i){if(!confirm('Supprimer ?'))return;S.urgences.splice(i,1);sv();renderUrgences();}
+function renderUrgences(){if(!S.urgences.length){G('urg-list').innerHTML='<div class="es">Aucun contact.</div>';return;}G('urg-list').innerHTML=S.urgences.map(function(u,i){return '<div class="urg-card"><div class="urg-icon" style="background:var(--bg2)"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h2l1 4-2 1.5a10 10 0 0 0 4.5 4.5L13 11l4 1v2a2 2 0 0 1-2 2C7 16 4 9 4 5a2 2 0 0 1 2-2z"/></svg></div><div style="flex:1"><div style="font-size:12px;font-weight:500">'+u.nom+(u.role?' <span style="font-size:11px;color:var(--text2)">— '+u.role+'</span>':'')+'</div><div class="urg-tel">'+( u.tel||'—')+'</div><div style="margin-top:3px"><span class="badge b-n">'+u.dispo+'</span>'+(u.notes?' <span style="font-size:11px;color:var(--text3)">'+u.notes+'</span>':'')+'</div></div><button class="del" onclick="delUrg('+i+')">✕</button></div>';}).join('');}
+
+// ─── UTILS DOCS ────────────────────────────────────────────────────
+function copyDoc(id){navigator.clipboard.writeText(G(id).textContent).then(function(){var e=G(id);e.style.outline='2px solid #63a020';setTimeout(function(){e.style.outline='';},1400);});}
+function printDoc(id){var t=G(id).textContent;var w=window.open('','_blank');w.document.write('<html><head><title>'+getNom()+'</title><style>body{font-family:Georgia,serif;font-size:12pt;line-height:1.8;padding:3cm 2.5cm;white-space:pre-wrap}</style></head><body>'+t+'</body></html>');w.document.close();w.print();}
+
+// ─── EXPORT WORD ───────────────────────────────────────────────────
+function exportToWord(htmlContent,filename){
+  var logo=localStorage.getItem('syndic_v10_logo')||localStorage.getItem('syndic_v10_logo')||localStorage.getItem('syndic_v10_logo')||localStorage.getItem('syndic_v8_logo')||localStorage.getItem('syndic_v7_logo')||localStorage.getItem('syndic_v3_logo')||'';
+  var logoHtml=logo?'<div style="margin-bottom:12px"><img src="'+logo+'" style="max-height:28px;max-width:80px;object-fit:contain;vertical-align:middle"/></div>':'';
+  var entete='<div style="border-bottom:3px solid #1a56a0;padding-bottom:10px;margin-bottom:20px">'+logoHtml+'<div style="font-size:16pt;font-weight:bold;color:#1a56a0">'+getNom()+'</div><div style="font-size:10pt;color:#555">'+getAdr()+'</div></div>';
+  var full='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:11pt;margin:2cm}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px 8px;font-size:10pt}th{background:#2c3e50;color:#fff;text-align:left}</style></head><body>'+entete+htmlContent+'</body></html>';
+  var blob=new Blob(['\uFEFF'+full],{type:'application/msword;charset=utf-8'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=filename+'.doc';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1000);
+}
+
+function exportCourrierDocx(){var texte=G('co-prev').textContent;if(!texte||texte.length<10){alert('Générez d\'abord un courrier.');return;}var html='';texte.split('\n').forEach(function(line){if(!line.trim()){html+='<br>';return;}if(line.startsWith('OBJET :'))html+='<p style="font-weight:bold;color:#1a56a0;font-size:12pt;margin:14px 0">'+line+'</p>';else html+='<p style="margin:6px 0;line-height:1.7">'+line+'</p>';});exportToWord(html,'Courrier_'+new Date().toISOString().slice(0,10));}
+function exportAGDocx(){var texte=G('ag-doc').textContent;if(!texte||texte.length<10){alert('Générez d\'abord un document AG.');return;}var html='';texte.split('\n').forEach(function(line,i){if(!line.trim()){html+='<br>';return;}if(line.startsWith('═')||line.startsWith('─')){html+='<hr style="border:none;border-top:1px solid #ccc;margin:8px 0">';return;}var up=line===line.toUpperCase()&&line.trim().length>4;if(i<5&&up)html+='<h2 style="color:#1a56a0;margin:16px 0 6px">'+line+'</h2>';else if(line.startsWith('RÉSOLUTION'))html+='<p style="font-weight:bold;color:#1a56a0;margin:14px 0 4px">'+line+'</p>';else html+='<p style="margin:5px 0;line-height:1.7">'+line+'</p>';});exportToWord(html,'AG_'+getNom().replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10));}
+
+function exportAppelDocx(){
+  var a=S.appels[currentApelIdx];if(!a){alert('Sélectionnez un appel de fonds.');return;}
+  // Forcer la sauvegarde des infos immeuble avant export
+  saveImm();
+  var totDu=0,totPay=0;a.copros.forEach(function(c){totDu+=c.lignes.reduce(function(s,l){return s+l.montant;},0);totPay+=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);});
+  var html='<h2 style="color:#1a56a0">APPEL DE FONDS — '+a.titre+'</h2>';
+  html+='<p style="color:#555;margin-bottom:6px">Émis le '+fmtDate(a.emission)+' · Échéance : '+fmtDate(a.echeance)+'</p>';
+  html+='<p style="background:#e8f0fe;padding:10px;border-left:4px solid #1a56a0;margin-bottom:16px"><strong>Total : '+totDu.toFixed(2)+' €</strong> · Recouvré : '+totPay.toFixed(2)+' € · Reste : '+(totDu-totPay).toFixed(2)+' €</p>';
+  if(S.immeuble.rib)html+='<p style="background:#eaf3de;padding:10px;border-left:4px solid #63a020;margin-bottom:16px"><strong>Virement à effectuer — IBAN : '+S.immeuble.rib+'</strong>'+(S.immeuble.banque?' · Banque : '+S.immeuble.banque:'')+(S.immeuble.domiciliation?' · '+S.immeuble.domiciliation:'')+'</p>';
+  html+='<table><thead><tr><th>Lot</th><th>Copropriétaire</th><th>Tant.</th>';
+  a.lignes.forEach(function(l){html+='<th>'+l.nat+(l.periode?' ('+l.periode+')':'')+'</th>';});
+  html+='<th>Total dû</th><th>Payé</th><th>Reste</th><th>Statut</th></tr></thead><tbody>';
+  a.copros.forEach(function(c,ri){var du=c.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=c.lignes.reduce(function(s,l){return s+(l.paye||0);},0);var reste=du-pay;var statut=reste<0.01?'Soldé':pay>0?'Partiel':'Impayé';html+='<tr style="background:'+(ri%2===0?'#f7f9fc':'#fff')+'"><td><strong>'+c.lot+'</strong></td><td>'+c.nom+'</td><td>'+c.tan+'</td>';c.lignes.forEach(function(l){html+='<td style="text-align:right">'+l.montant.toFixed(2)+' €</td>';});html+='<td style="text-align:right;font-weight:bold">'+du.toFixed(2)+' €</td><td style="text-align:right;color:green">'+pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(reste>0?'red':'green')+'">'+reste.toFixed(2)+' €</td><td style="color:'+(reste<0.01?'green':pay>0?'#854f0b':'red')+'">'+statut+'</td></tr>';});
+  html+='</tbody></table><p style="margin-top:16px;color:#888;font-size:9pt">Généré le '+today()+' — '+getSyn()+'</p>';
+  exportToWord(html,'Repartition_'+a.titre.replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10));
+}
+
+
+// ─── EXPORT PDF ────────────────────────────────────────────────────
+function exportToPDF(htmlContent, title){
+  var logo=localStorage.getItem('syndic_v10_logo')||S.logo||'';
+  var logoHtml=logo?'<img src="'+logo+'" style="max-height:28px;max-width:80px;object-fit:contain;vertical-align:middle;margin-right:10px"/>':'';
+  var entete='<div style="display:flex;align-items:center;border-bottom:3px solid #1a56a0;padding-bottom:10px;margin-bottom:20px">'+logoHtml+'<div><div style="font-size:14pt;font-weight:bold;color:#1a56a0">'+getNom()+'</div><div style="font-size:9pt;color:#555">'+getAdr()+'</div></div></div>';
+  var fullHtml='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;font-size:10pt;color:#111;padding:1.5cm 2cm;margin:0}'+
+    'table{width:100%;border-collapse:collapse;margin:10px 0}'+
+    'th,td{border:1px solid #ccc;padding:5px 7px;font-size:9pt;text-align:left}'+
+    'th{background:#2c3e50;color:#fff}tr:nth-child(even){background:#f7f9fc}'+
+    'h2{color:#1a56a0;margin-bottom:6px}h3{color:#333;margin:14px 0 4px}'+
+    '@page{size:A4;margin:1.5cm}</style></head>'+
+    '<body>'+entete+htmlContent+'</body></html>';
+  // Use html2pdf.js loaded from CDN
+  if(typeof html2pdf!=='undefined'){
+    var el=document.createElement('div');
+    el.innerHTML=entete+htmlContent;
+    document.body.appendChild(el);
+    html2pdf().set({
+      margin:15,filename:(title||'document')+'.pdf',
+      image:{type:'jpeg',quality:.95},
+      html2canvas:{scale:2,useCORS:true},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+    }).from(el).save().then(function(){document.body.removeChild(el);});
+  } else {
+    // Fallback : charger html2pdf dynamiquement puis relancer
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.onload=function(){exportToPDF(htmlContent,title);};
+    s.onerror=function(){
+      // Dernier recours : blob téléchargeable (HTML renommé .html, pas PDF natif)
+      var blob=new Blob([fullHtml],{type:'text/html;charset=utf-8'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download=(title||'document')+'.html';a.click();
+      alert('Le PDF a été généré en HTML. Ouvrez-le dans votre navigateur et utilisez Fichier → Imprimer → Enregistrer en PDF si nécessaire.');
+    };
+    document.head.appendChild(s);
+  }
+}
+
+function exportAGPdf(){
+  var texte=G('ag-doc').textContent;
+  if(!texte||texte.length<10){alert('Générez d\'abord un document AG.');return;}
+  var html='';
+  texte.split('\n').forEach(function(line){
+    if(!line.trim()){html+='<br>';return;}
+    if(line.startsWith('═')||line.startsWith('─')){html+='<hr style="border:none;border-top:1px solid #ccc;margin:6px 0">';return;}
+    var up=line===line.toUpperCase()&&line.trim().length>4;
+    if(up)html+='<h2 style="color:#1a56a0;margin:14px 0 4px">'+line+'</h2>';
+    else if(line.startsWith('RÉSOLUTION'))html+='<p style="font-weight:bold;color:#1a56a0;margin:12px 0 3px">'+line+'</p>';
+    else html+='<p style="margin:4px 0;line-height:1.6">'+line+'</p>';
+  });
+  exportToPDF(html,'AG_'+getNom());
+}
+
+function exportCourrierPdf(){
+  var texte=G('co-prev').textContent;
+  if(!texte||texte.length<10){alert('Générez d\'abord un courrier.');return;}
+  var html='';
+  texte.split('\n').forEach(function(line){
+    if(!line.trim()){html+='<br>';return;}
+    if(line.startsWith('OBJET :'))html+='<p style="font-weight:bold;color:#1a56a0;margin:12px 0">'+line+'</p>';
+    else html+='<p style="margin:5px 0;line-height:1.6">'+line+'</p>';
+  });
+  exportToPDF(html,'Courrier_'+getNom());
+}
+
+function exportAppelPdf(){
+  var a=S.appels[currentApelIdx];if(!a){alert('Sélectionnez un appel de fonds.');return;}
+  saveImm();
+  var totDu=0,totPay=0;
+  a.copros.forEach(function(co){totDu+=co.lignes.reduce(function(s,l){return s+l.montant;},0);totPay+=co.lignes.reduce(function(s,l){return s+(l.paye||0);},0);});
+  var html='<h2>APPEL DE FONDS — '+a.titre+'</h2>';
+  html+='<p style="color:#555;margin-bottom:6px">Émis le '+fmtDate(a.emission)+' · Échéance : '+fmtDate(a.echeance)+'</p>';
+  html+='<p style="background:#e8f0fe;padding:8px;border-left:4px solid #1a56a0;margin-bottom:10px"><strong>Total : '+totDu.toFixed(2)+' €</strong> · Recouvré : '+totPay.toFixed(2)+' € · Reste : '+(totDu-totPay).toFixed(2)+' €</p>';
+  if(S.immeuble.rib)html+='<p style="background:#eaf3de;padding:8px;border-left:4px solid #63a020;margin-bottom:10px"><strong>IBAN : '+S.immeuble.rib+'</strong>'+(S.immeuble.banque?' · '+S.immeuble.banque:'')+'</p>';
+  html+='<table><thead><tr><th>Lot</th><th>Copropriétaire</th><th>Tant.</th>';
+  a.lignes.forEach(function(l){html+='<th>'+l.nat+(l.periode?' ('+l.periode+')':'')+'</th>';});
+  html+='<th>Total dû</th><th>Payé</th><th>Reste</th><th>Statut</th></tr></thead><tbody>';
+  a.copros.forEach(function(co,ri){var du=co.lignes.reduce(function(s,l){return s+l.montant;},0);var pay=co.lignes.reduce(function(s,l){return s+(l.paye||0);},0);var reste=du-pay;var statut=reste<0.01?'Soldé':pay>0?'Partiel':'Impayé';html+='<tr><td><strong>'+co.lot+'</strong></td><td>'+co.nom+'</td><td>'+co.tan+'</td>';co.lignes.forEach(function(l){html+='<td style="text-align:right">'+l.montant.toFixed(2)+' €</td>';});html+='<td style="text-align:right;font-weight:bold">'+du.toFixed(2)+' €</td><td style="text-align:right;color:green">'+pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(reste>0?'red':'green')+'">'+reste.toFixed(2)+' €</td><td>'+statut+'</td></tr>';});
+  html+='</tbody></table><p style="margin-top:12px;color:#888;font-size:8pt">Généré le '+today()+' — '+getSyn()+'</p>';
+  exportToPDF(html,'Appel_'+a.titre);
+}
+
+function exportRelevePdf(){
+  var sel=G('releve-select');var idx=sel?parseInt(sel.value):NaN;
+  if(isNaN(idx)||idx<0||!S.copros[idx]){alert('Sélectionnez un copropriétaire.');return;}
+  var cop=S.copros[idx];var lignes=calcReleve(cop);
+  var lotsStr=getCopLotNums(cop).join('+');
+  var totDu=lignes.reduce(function(s,l){return s+l.du;},0);var totPay=lignes.reduce(function(s,l){return s+l.pay;},0);var totReste=totDu-totPay;
+  var html='<h2>RELEVÉ DE SITUATION — Lot(s) '+lotsStr+' — '+cop.pre+' '+cop.nom+'</h2>';
+  html+='<p style="background:#e8f0fe;padding:8px;border-left:4px solid #1a56a0;margin-bottom:12px"><strong>Appelé : '+totDu.toFixed(2)+' € · Payé : '+totPay.toFixed(2)+' € · Solde : '+totReste.toFixed(2)+' €</strong></p>';
+  if(S.immeuble.rib)html+='<p style="background:#eaf3de;padding:8px;border-left:4px solid #63a020;margin-bottom:10px"><strong>IBAN : '+S.immeuble.rib+'</strong>'+(S.immeuble.banque?' · '+S.immeuble.banque:'')+'</p>';
+  lignes.forEach(function(l){
+    html+='<h3 style="color:#1a56a0;margin:14px 0 4px">'+l.appel+'</h3>';
+    html+='<table><thead><tr><th>Nature</th><th>Période</th><th>Appelé</th><th>Payé</th><th>Reste</th><th>Statut</th></tr></thead><tbody>';
+    l.details.forEach(function(d){var dr=d.montant-(d.paye||0);html+='<tr><td>'+d.nat+'</td><td>'+(d.periode||'—')+'</td><td style="text-align:right">'+d.montant.toFixed(2)+' €</td><td style="text-align:right;color:green">'+(d.paye||0).toFixed(2)+' €</td><td style="text-align:right;color:'+(dr>0?'red':'green')+'">'+dr.toFixed(2)+' €</td><td>'+(dr<0.01?'Soldé':d.paye>0?'Partiel':'Impayé')+'</td></tr>';});
+    html+='<tr style="font-weight:bold;background:#e8edf5"><td colspan="2">Total</td><td style="text-align:right">'+l.du.toFixed(2)+' €</td><td style="text-align:right;color:green">'+l.pay.toFixed(2)+' €</td><td style="text-align:right;color:'+(l.reste>0?'red':'green')+'">'+l.reste.toFixed(2)+' €</td><td>'+(l.reste<0.01?'Soldé':l.pay>0?'Partiel':'Impayé')+'</td></tr>';
+    html+='</tbody></table>';
+  });
+  html+='<p style="margin-top:12px;color:#888;font-size:8pt">Édité le '+today()+' par '+getSyn()+'</p>';
+  exportToPDF(html,'Releve_Lot'+lotsStr+'_'+cop.nom);
+}
+
+function exportBudgetPdf(an){
+  var postes=an?S.budget.filter(function(b){return String(b.an)===String(an);}):S.budget;
+  if(!postes.length){alert('Aucun poste pour cette année.');return;}
+  var tPr=postes.reduce(function(s,b){return s+b.pr;},0);
+  var tRe=postes.reduce(function(s,b){return s+b.re;},0);
+  var pct=tPr?Math.round(tRe/tPr*100):0;
+  var html='<h2>BUDGET PRÉVISIONNEL'+(an?' — '+an:'')+'</h2>';
+  html+='<p style="background:#e8f0fe;padding:8px;border-left:4px solid #1a56a0;margin-bottom:12px"><strong>Prévu : '+tPr.toFixed(2)+' €</strong> · Réel : '+tRe.toFixed(2)+' € · Exécution : '+pct+' %</p>';
+  html+='<table><thead><tr><th>Poste</th><th>Compte</th><th>Catégorie</th><th style="text-align:right">Prévu</th><th style="text-align:right">Réel</th><th style="text-align:right">Écart</th></tr></thead><tbody>';
+  postes.forEach(function(b){var e=b.re-b.pr;html+='<tr><td><strong>'+b.p+'</strong>'+(b.an&&!an?'<br><small>'+b.an+'</small>':'')+'</td><td style="font-size:8pt;color:#555">'+(b.compte||'—')+'</td><td>'+b.cat+'</td><td style="text-align:right">'+b.pr.toFixed(2)+' €</td><td style="text-align:right;color:'+(b.re>0?'green':'#888')+'">'+b.re.toFixed(2)+' €</td><td style="text-align:right;color:'+(e>0?'red':e<0?'green':'#555')+'">'+(e>0?'+':'')+e.toFixed(2)+' €</td></tr>';});
+  html+='</tbody></table><p style="margin-top:12px;color:#888;font-size:8pt">Généré le '+today()+' — '+getSyn()+'</p>';
+  exportToPDF(html,'Budget'+(an?'_'+an:'')+'_'+getNom());
+}
+
+// ─── DONNÉES ───────────────────────────────────────────────────────
+function updateStats(){var el=G('stats-list');if(!el)return;var cout=S.interventions.reduce(function(s,i){return s+(parseFloat(i.cout)||0);},0);var fsolde=S.fonds.reduce(function(s,f){return s+(f.type==='provision'?f.mnt:-f.mnt);},0);var rows=[['Copropriétaires',S.copros.length],['Total tantièmes',S.copros.reduce(function(s,c){return s+c.tan;},0)+'/10000'],['Lots bâtiment',S.lots_bat.length],['Clés de répartition',S.cles_rep.length],['Appels de fonds',S.appels.length],['Interventions',S.interventions.length],['Coût interventions',Math.round(cout)+' €'],['Sinistres',S.sinistres.length],['Contrats actifs',S.prestataires.filter(function(p){return p.sta==='actif';}).length],['Solde fonds travaux',Math.round(fsolde)+' €'],['Entrées journal',S.journal.length],['Clés en circulation',S.cles.filter(function(c){return c.sta==='remis';}).length],['AG archivées',S.ag_hist.length]];el.innerHTML=rows.map(function(r){return '<div class="stat-row"><span style="color:var(--text2)">'+r[0]+'</span><strong>'+r[1]+'</strong></div>';}).join('');}
+
+function exportData(){var logo=localStorage.getItem('syndic_v10_logo')||localStorage.getItem('syndic_v10_logo');if(logo)S.logo=logo;var filename='syndic_'+(S.immeuble.nom||'copro').replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.json';var b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;a.click();}
+function importData(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(!confirm('Remplacer toutes les données ?'))return;if(d.listes)Object.keys(S.listes).forEach(function(k){if(d.listes[k])S.listes[k]=d.listes[k];});var keys=['immeuble','copros','appels','budget','interventions','prestataires','fonds','sinistres','locations','cles','journal','urgences','events','ag','ag_hist','lots_bat','cles_rep'];keys.forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});if(d.logo){try{localStorage.setItem('syndic_v10_logo',d.logo);}catch(le){}}sv();alert('Import réussi !');setTimeout(function(){location.reload();},500);}catch(err){alert('Fichier invalide.');}};r.readAsText(f);}
+function clearAll(){if(!confirm('Effacer toutes les données ?'))return;if(!confirm('Confirmez-vous ?'))return;localStorage.removeItem('syndic_v10');localStorage.removeItem('syndic_v3');location.reload();}
+function importFromPaste(){var txt=G('json-paste').value.trim();var status=G('paste-status');if(!txt){status.innerHTML='<span style="color:#e24b4a">Aucun contenu.</span>';return;}try{var d=JSON.parse(txt);if(!confirm('Remplacer toutes les données ?'))return;if(d.listes)Object.keys(S.listes).forEach(function(k){if(d.listes[k])S.listes[k]=d.listes[k];});var keys=['immeuble','copros','appels','budget','interventions','prestataires','fonds','sinistres','locations','cles','journal','urgences','events','ag','ag_hist','lots_bat','cles_rep'];keys.forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});if(d.logo){try{localStorage.setItem('syndic_v10_logo',d.logo);}catch(le){}}sv();status.innerHTML='<span style="color:#63a020">✓ Import réussi !</span>';setTimeout(function(){location.reload();},800);}catch(err){status.innerHTML='<span style="color:#e24b4a">✗ JSON invalide : '+err.message+'</span>';}}
+function exportJsonToClipboard(){var logo=localStorage.getItem('syndic_v10_logo')||localStorage.getItem('syndic_v10_logo');if(logo)S.logo=logo;var txt=JSON.stringify(S,null,2);navigator.clipboard.writeText(txt).then(function(){alert('✓ Données copiées dans le presse-papiers !');}).catch(function(){var prev=G('json-paste');if(prev){prev.textContent=txt;}alert('Copiez manuellement depuis la zone de texte.');});}
+
+// ─── LOGO ──────────────────────────────────────────────────────────
+function uploadLogo(e){var file=e.target.files[0];if(!file)return;if(file.size>2*1024*1024){alert('Image trop volumineuse (max 2 Mo).');return;}var r=new FileReader();r.onload=function(ev){var b64=ev.target.result;try{localStorage.setItem('syndic_v10_logo',b64);S.logo=b64;sv();applyLogo();alert('Logo chargé avec succès.');}catch(ex){alert('Erreur : image trop grande pour le stockage.');}};r.readAsDataURL(file);}
+function removeLogo(){if(!confirm('Supprimer le logo ?'))return;localStorage.removeItem('syndic_v10_logo');localStorage.removeItem('syndic_v10_logo');delete S.logo;sv();applyLogo();}
+function applyLogo(){var logo=localStorage.getItem('syndic_v10_logo')||localStorage.getItem('syndic_v10_logo')||S.logo||null;var wrap=G('header-logo-wrap'),img=G('header-logo');if(logo){wrap.style.display='block';img.src=logo;}else{wrap.style.display='none';img.src='';}var prev=G('logo-preview'),wrap2=G('logo-preview-wrap'),ph=G('logo-placeholder'),delBtn=G('logo-del-btn');if(logo){if(prev)prev.src=logo;if(wrap2)wrap2.style.display='block';if(ph)ph.style.display='none';if(delBtn)delBtn.style.display='inline-flex';}else{if(wrap2)wrap2.style.display='none';if(ph)ph.style.display='flex';if(delBtn)delBtn.style.display='none';}}
+
+// ─── INITIALISATION ────────────────────────────────────────────────
+aplLignes=[{nat:S.listes.natures_charges[0],montant:0,cle:S.listes.cles_repartition[0],periode:''}];
+ld();
+renderLignes();
+</script>
+</body>
+</html>
