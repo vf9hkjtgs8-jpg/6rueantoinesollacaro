@@ -1,0 +1,644 @@
+{
+  "immeuble": {
+    "nom": "",
+    "adr": "6 Rue Antoine Sollacaro, 20090 Ajaccio",
+    "lots": "16",
+    "an": "1935",
+    "syn": "Philippe BASSOUL",
+    "rib": "FR76 1200 6000 1482 1069 8233 091",
+    "banque": "AGRFRPP820",
+    "domiciliation": "Crédit Agricole "
+  },
+  "copros": [
+    {
+      "nom": "BASSOUL",
+      "pre": "Hana & Philippe",
+      "lots": [
+        {
+          "num": "12",
+          "tan": 969,
+          "eta": "3e"
+        },
+        {
+          "num": "16",
+          "tan": 543,
+          "eta": "4e"
+        }
+      ],
+      "tel": "0619247408",
+      "email": "philbassoul@gmail.com",
+      "occ": "Résidence principale",
+      "notes": "",
+      "lot": "12",
+      "tan": 1512,
+      "eta": "3e"
+    },
+    {
+      "nom": "VAN STEELANT",
+      "pre": "Celia",
+      "lots": [
+        {
+          "num": "6",
+          "tan": 87,
+          "eta": "1er"
+        },
+        {
+          "num": "7",
+          "tan": 1098,
+          "eta": "1er"
+        }
+      ],
+      "tel": "0624086910",
+      "email": "vstl.eric@gmail.com",
+      "occ": "Résidence secondaire",
+      "notes": "Quartier Finosello Route d'Erbajolo, 20090 AJACCIO",
+      "lot": "6",
+      "tan": 1185,
+      "eta": "1er"
+    },
+    {
+      "nom": "MINICONI",
+      "pre": "Monique & Marie-Hélène",
+      "lots": [
+        {
+          "num": "1",
+          "tan": 838,
+          "eta": "RDC"
+        },
+        {
+          "num": "10",
+          "tan": 1006,
+          "eta": "3e"
+        },
+        {
+          "num": "11",
+          "tan": 86,
+          "eta": "3e"
+        },
+        {
+          "num": "14",
+          "tan": 36,
+          "eta": "4e"
+        }
+      ],
+      "tel": "0634642269",
+      "email": "",
+      "occ": "Résidence principale",
+      "notes": "",
+      "lot": "1",
+      "tan": 1966,
+      "eta": "RDC"
+    },
+    {
+      "nom": "MINICONI",
+      "pre": "Monique & Paule",
+      "lots": [
+        {
+          "num": "8",
+          "tan": 1160,
+          "eta": "2e"
+        }
+      ],
+      "tel": "0629385694",
+      "email": "",
+      "occ": "Résidence principale",
+      "notes": "",
+      "lot": "8",
+      "tan": 1160,
+      "eta": "2e"
+    },
+    {
+      "nom": "OTTAVIANI & RAFFALI",
+      "pre": "Appolonie & Daniel",
+      "lots": [
+        {
+          "num": "2",
+          "tan": 200,
+          "eta": "RDC"
+        }
+      ],
+      "tel": "0603281389",
+      "email": "daniel.raffali@aec.corsica",
+      "occ": "Résidence principale",
+      "notes": "",
+      "lot": "2",
+      "tan": 200,
+      "eta": "RDC"
+    },
+    {
+      "nom": "QUASTANA",
+      "pre": "Christine",
+      "lots": [
+        {
+          "num": "13",
+          "tan": 572,
+          "eta": "4e"
+        }
+      ],
+      "tel": "0611312719",
+      "email": "quastanachris@gmail.com",
+      "occ": "Bailleur (location)",
+      "notes": "",
+      "lot": "13",
+      "tan": 572,
+      "eta": "4e"
+    },
+    {
+      "nom": "ROMANI",
+      "pre": "Marcelle",
+      "lots": [
+        {
+          "num": "5",
+          "tan": 1027,
+          "eta": "1er"
+        }
+      ],
+      "tel": "0611380267",
+      "email": "marcelle.romani@gmail.com",
+      "occ": "Bailleur (location)",
+      "notes": "",
+      "lot": "5",
+      "tan": 1027,
+      "eta": "1er"
+    },
+    {
+      "nom": "SCI",
+      "pre": "Paulo",
+      "lots": [
+        {
+          "num": "3",
+          "tan": 1299,
+          "eta": "RDC"
+        }
+      ],
+      "tel": "0618022213",
+      "email": "jlc.dk59@gmail.com",
+      "occ": "Résidence secondaire",
+      "notes": "",
+      "lot": "3",
+      "tan": 1299,
+      "eta": "RDC"
+    },
+    {
+      "nom": "TESTOU",
+      "pre": "Roselyne",
+      "lots": [
+        {
+          "num": "4",
+          "tan": 56,
+          "eta": "RDC"
+        },
+        {
+          "num": "9",
+          "tan": 993,
+          "eta": "2e"
+        },
+        {
+          "num": "15",
+          "tan": 30,
+          "eta": "4e"
+        }
+      ],
+      "tel": "0620097043",
+      "email": "roselyne.testou@orange.fr",
+      "occ": "Résidence secondaire",
+      "notes": "Coletta, 20136 Bocognano",
+      "lot": "4",
+      "tan": 1079,
+      "eta": "RDC"
+    }
+  ],
+  "appels": [],
+  "budget": [
+    {
+      "p": "GAN Assurance",
+      "pr": 2123.26,
+      "re": 2185.17,
+      "cat": "Assurances",
+      "an": "2026",
+      "compte": "616"
+    },
+    {
+      "p": "ARC COPRO",
+      "pr": 160,
+      "re": 160,
+      "cat": "Divers",
+      "an": "2026",
+      "compte": "628"
+    },
+    {
+      "p": "EDF",
+      "pr": 180,
+      "re": 0,
+      "cat": "Personnel / entretien",
+      "an": "2026",
+      "compte": "611"
+    },
+    {
+      "p": "Crédit Agricole",
+      "pr": 66,
+      "re": 0,
+      "cat": "Divers",
+      "an": "2026",
+      "compte": "628"
+    }
+  ],
+  "interventions": [
+    {
+      "type": "Entretien courant",
+      "dt": "2021-09-01",
+      "loc": "Parties communes — Escalier",
+      "desc": "Remplacement de la vitre cassée de la fenêtre entre le 2eme et 3eme étage",
+      "cout": 0,
+      "int": "François BASSOUL",
+      "sta": "terminé"
+    },
+    {
+      "type": "Entretien courant",
+      "dt": "2022-04-01",
+      "loc": "Parties communes — Escalier",
+      "desc": "Fourniture et pose boule d’escalier",
+      "cout": 0,
+      "int": "Philippe BASSOUL",
+      "sta": "terminé"
+    }
+  ],
+  "prestataires": [
+    {
+      "nom": "GAN Assurance",
+      "spe": "Assurance immeuble",
+      "tel": "0495221790",
+      "email": "ajaccio-kennedy@gan.fr",
+      "deb": "2025-10-01",
+      "fin": "2026-09-30",
+      "mnt": 2123.26,
+      "ref": "311340192000",
+      "sta": "actif",
+      "notes": ""
+    },
+    {
+      "nom": "ARC COPRO",
+      "spe": "Autre",
+      "tel": "",
+      "email": "",
+      "deb": "2025-12-01",
+      "fin": "2026-12-01",
+      "mnt": 160,
+      "ref": "20PC32867",
+      "sta": "actif",
+      "notes": ""
+    },
+    {
+      "nom": "EDF",
+      "spe": "Électricité",
+      "tel": "09 69 32 25 20",
+      "email": "SEI.EDF.COM",
+      "deb": "2026-01-01",
+      "fin": "2026-12-31",
+      "mnt": 180,
+      "ref": "25700000070940",
+      "sta": "actif",
+      "notes": ""
+    },
+    {
+      "nom": "Crédit Agricole",
+      "spe": "Banque",
+      "tel": "",
+      "email": "",
+      "deb": "2026-01-01",
+      "fin": "2027-01-01",
+      "mnt": 66,
+      "ref": "82106982348",
+      "sta": "actif",
+      "notes": ""
+    }
+  ],
+  "fonds": [],
+  "sinistres": [],
+  "locations": [],
+  "cles": [],
+  "journal": [],
+  "urgences": [],
+  "events": [],
+  "lots_bat": [
+    {
+      "num": "1",
+      "ref": "",
+      "type": "Local commercial",
+      "etage": "RDC",
+      "surf": 65.99,
+      "tan": 838,
+      "desc": "un local commercial à droite"
+    },
+    {
+      "num": "2",
+      "ref": "",
+      "type": "Local commercial",
+      "etage": "RDC",
+      "surf": 31.57,
+      "tan": 200,
+      "desc": "un local commercial, le premier à gauche du portail d'entrée"
+    },
+    {
+      "num": "3",
+      "ref": "",
+      "type": "Local commercial",
+      "etage": "RDC",
+      "surf": 102.36,
+      "tan": 1299,
+      "desc": "un local commercial, le deuxieme à gauche du portail d'entrée"
+    },
+    {
+      "num": "4",
+      "ref": "",
+      "type": "Autre",
+      "etage": "RDC",
+      "surf": 20,
+      "tan": 56,
+      "desc": "un dessous d'escalier, à droite dans le portail d'entrée"
+    },
+    {
+      "num": "5",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "1er",
+      "surf": 73.15,
+      "tan": 1027,
+      "desc": "un appartement au premier etage, à gauche en montant"
+    },
+    {
+      "num": "6",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "1er",
+      "surf": 5.72,
+      "tan": 87,
+      "desc": "une piece au premier etage au centre"
+    },
+    {
+      "num": "7",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "1er",
+      "surf": 83.67,
+      "tan": 1098,
+      "desc": "un appartement au premier etage à droite en montant"
+    },
+    {
+      "num": "8",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "2e",
+      "surf": 80.01,
+      "tan": 1160,
+      "desc": "Un appartement au deuxième étage, à gauche en montant"
+    },
+    {
+      "num": "9",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "2e",
+      "surf": 70.24,
+      "tan": 993,
+      "desc": "Un appartement au deuxième étage, à droite en montant"
+    },
+    {
+      "num": "10",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "3e",
+      "surf": 73.14,
+      "tan": 1006,
+      "desc": "Un appartement au troisième étage, à gauche en montant"
+    },
+    {
+      "num": "11",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "3e",
+      "surf": 5.97,
+      "tan": 86,
+      "desc": "Une pièce au troisième étage au centre"
+    },
+    {
+      "num": "12",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "3e",
+      "surf": 70.64,
+      "tan": 969,
+      "desc": "Un duplex au troisième étage, à droite en montant"
+    },
+    {
+      "num": "13",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "4e",
+      "surf": 57.85,
+      "tan": 572,
+      "desc": "Une mansarde, au quatrième étage, à gauche"
+    },
+    {
+      "num": "14",
+      "ref": "",
+      "type": "Grenier",
+      "etage": "4e",
+      "surf": 6.46,
+      "tan": 36,
+      "desc": "Un grenier au quatrième étage, au centre et à gauche"
+    },
+    {
+      "num": "15",
+      "ref": "",
+      "type": "Grenier",
+      "etage": "4e",
+      "surf": 5.26,
+      "tan": 30,
+      "desc": "Un grenier au quatrième étage, au centre et à droite"
+    },
+    {
+      "num": "16",
+      "ref": "",
+      "type": "Appartement",
+      "etage": "4e",
+      "surf": 54.53,
+      "tan": 543,
+      "desc": "Une mansarde, au quatrième étage, à droite"
+    }
+  ],
+  "cles_rep": [
+    {
+      "nom": "Cage escalier",
+      "total": 10000,
+      "desc": "Lots impactés  par la cage d'escalier",
+      "lots": {
+        "5": 1350,
+        "6": 115,
+        "7": 1443,
+        "8": 1525,
+        "9": 1305,
+        "10": 1322,
+        "11": 114,
+        "12": 1274,
+        "13": 752,
+        "14": 47,
+        "15": 39,
+        "16": 714
+      }
+    }
+  ],
+  "ag": {
+    "dt": "",
+    "h": "18:00",
+    "lieu": "",
+    "type": "Assemblée générale ordinaire",
+    "odj": []
+  },
+  "ag_hist": [],
+  "listes": {
+    "etages": [
+      "RDC",
+      "1er",
+      "2e",
+      "3e",
+      "4e",
+      "5e",
+      "6e"
+    ],
+    "occupations": [
+      "Résidence principale",
+      "Résidence secondaire",
+      "Bailleur (location)",
+      "Local commercial"
+    ],
+    "natures_charges": [
+      "Charges courantes",
+      "Fonds travaux",
+      "Charges exceptionnelles",
+      "Eau collective",
+      "Entretien parties communes",
+      "Assurance",
+      "Ravalement",
+      "Ascenseur",
+      "Ménage",
+      "Gardiennage"
+    ],
+    "cles_repartition": [
+      "Tantièmes généraux (1000e)",
+      "Tantièmes eau",
+      "Tantièmes ascenseur",
+      "Tantièmes escalier",
+      "Cage escalier"
+    ],
+    "types_lot": [
+      "Appartement",
+      "Studio",
+      "Local commercial",
+      "Grenier",
+      "Mansarde",
+      "Autre"
+    ],
+    "types_intervention": [
+      "Entretien courant",
+      "Réparation urgente",
+      "Sinistre",
+      "Contrôle réglementaire",
+      "Travaux votés en AG",
+      "Diagnostic"
+    ],
+    "localisations": [
+      "Parties communes — RDC",
+      "Parties communes — Escalier",
+      "Toiture / terrasse",
+      "Cave / sous-sol",
+      "Façade",
+      "Ascenseur",
+      "Réseau électrique",
+      "Réseau plomberie",
+      "Lot privatif",
+      "Autre"
+    ],
+    "statuts_intervention": [
+      "urgent",
+      "planifié",
+      "en cours",
+      "terminé"
+    ],
+    "specialites_prest": [
+      "Assurance immeuble",
+      "Banque",
+      "Ménage",
+      "Plomberie",
+      "Électricité",
+      "Jardinage",
+      "Maçonnerie",
+      "Désinsectisation",
+      "Syndic"
+    ],
+    "statuts_prest": [
+      "actif",
+      "à renouveler",
+      "résilié"
+    ],
+    "types_cle": [
+      "Clé portail",
+      "Clé hall",
+      "Clé boîte aux lettres",
+      "Badge électronique",
+      "Clé cave",
+      "Clé local vélos",
+      "Clé parking",
+      "Autre"
+    ],
+    "statuts_cle": [
+      "remis",
+      "restitué",
+      "perdu"
+    ],
+    "types_location": [
+      "Place de parking",
+      "Box / garage",
+      "Local vélos",
+      "Cave",
+      "Local commercial",
+      "Autre"
+    ],
+    "categories_budget": [
+      "Personnel / entretien",
+      "Assurances",
+      "Ascenseur",
+      "Eau et énergie",
+      "Travaux",
+      "Frais administratifs",
+      "Fonds travaux",
+      "Divers"
+    ],
+    "natures_sinistre": [
+      "Dégât des eaux",
+      "Incendie",
+      "Vandalisme",
+      "Tempête / intempérie",
+      "Bris de glace",
+      "Effondrement / fissures",
+      "Vol / cambriolage",
+      "Autre"
+    ],
+    "statuts_sinistre": [
+      "déclaré",
+      "expertise en cours",
+      "en attente indemnisation",
+      "clôturé"
+    ],
+    "categories_journal": [
+      "note",
+      "appel téléphonique",
+      "courrier envoyé",
+      "courrier reçu",
+      "visite / constat",
+      "décision prise",
+      "relance",
+      "suivi travaux"
+    ]
+  },
+  "logo": "data:image/png;base64,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"
+}
